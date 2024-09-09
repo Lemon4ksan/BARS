@@ -4,6 +4,7 @@ import functools
 from collections.abc import Sequence, Callable
 from typing import Optional, LiteralString, TypeVar, Any
 
+from .exceptions import Unauthorized, BClientException
 from ._base import ClientObject
 from ._diary import DiaryDay
 from ._schedule import DaySchedule, MonthSchedule
@@ -11,7 +12,7 @@ from ._marks import SummaryMarks, TotalMarks, AttendaceData, ProgressData
 from ._account import AccountInfo, PupilInfo
 from ._school import SchoolInfo, ClassInfo
 from ._homework import HomeworkDay
-from .exceptions import Unauthorized, BClientException
+from ._misc import Event
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -21,10 +22,10 @@ def log(method: F) -> F:
     logger = logging.getLogger(method.__module__)
 
     @functools.wraps(method)
-    def wrapper(*args, **kwargs) -> Any:
+    async def wrapper(*args, **kwargs) -> Any:
         logger.debug(f'Entering: {method.__name__}')
 
-        result = method(*args, **kwargs)
+        result = await method(*args, **kwargs)
         logger.info(result)
 
         logger.debug(f'Exiting: {method.__name__}')
@@ -78,12 +79,12 @@ class BClientAsync(ClientObject):
         self._httpx_client = None
         self.proxy = proxy
 
-    def __aenter__(self):
+    async def __aenter__(self):
         self._httpx_client = httpx.AsyncClient(proxy=self.proxy)
         return self
 
-    def __aexit__(self, exc_type, exc_val, exc_tb):
-        self._httpx_client.close()
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self._httpx_client.aclose()
 
     @log
     async def get_diary(self, date: str) -> Sequence['DiaryDay']:
@@ -102,7 +103,8 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             params={'date': date, 'is_diary': True},
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -133,7 +135,8 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             params={'date': date},
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -164,7 +167,8 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             params={'date': date},
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -198,7 +202,8 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             params={'date': date, 'interval': interval},
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -226,7 +231,8 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             params={'date': date},
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -250,7 +256,8 @@ class BClientAsync(ClientObject):
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -274,7 +281,8 @@ class BClientAsync(ClientObject):
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -298,7 +306,8 @@ class BClientAsync(ClientObject):
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -336,7 +345,8 @@ class BClientAsync(ClientObject):
                 'date_end': date_end
             },
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -374,7 +384,8 @@ class BClientAsync(ClientObject):
                 'date_end': date_end
             },
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -398,7 +409,8 @@ class BClientAsync(ClientObject):
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -422,7 +434,8 @@ class BClientAsync(ClientObject):
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -450,7 +463,8 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             params={'date': date, 'is_diary': True},
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -462,3 +476,32 @@ class BClientAsync(ClientObject):
         for i, day in enumerate(result):
             result[i] = HomeworkDay.de_json(day)
         return result
+
+    @log
+    async def get_events(self) -> Optional[Sequence['Event']]:
+        """Получить список текущих праздников.
+
+        Returns:
+            Sequence[:obj:`BARS.Events`], optional: Неделя домашнего задания. None если нет.
+        """
+
+        url = self.base_url + 'api/WidgetService/getEvents'
+        result = await self._httpx_client.get(
+            url,
+            headers=self.headers,
+            cookies={'sessionid': self.sessionid}
+        ).json()
+
+        if isinstance(result, dict) and 'faultcode' in result.keys():
+            match result['faultcode']:
+                case 'Server.UserNotAuthenticated':
+                    raise Unauthorized('Недействительный sessionid')
+                case _:
+                    raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
+
+        try:
+            for i, event in enumerate(result):
+                result[i] = Event.de_json(event)
+            return result
+        except TypeError:
+            return None

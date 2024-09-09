@@ -27,6 +27,10 @@ from ._marks import Mark
 from ._marks import TotalMarks
 from ._marks import TotalDisciplineMarks
 from ._marks import SummaryDisciplineMarks
+from ._marks import AttendaceData
+from ._marks import ProgressData
+
+from ._misc import Event
 
 __all__ = [
     'ClientObject',
@@ -50,5 +54,8 @@ __all__ = [
     'Mark',
     'TotalMarks',
     'TotalDisciplineMarks',
-    'SummaryDisciplineMarks'
+    'SummaryDisciplineMarks',
+    'AttendaceData',
+    'ProgressData',
+    'Event'
 ]

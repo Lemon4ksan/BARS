@@ -4,6 +4,7 @@ import functools
 from collections.abc import Sequence, Callable
 from typing import Optional, LiteralString, TypeVar, Any
 
+from .exceptions import Unauthorized, BClientException
 from ._base import ClientObject
 from ._diary import DiaryDay
 from ._schedule import DaySchedule, MonthSchedule
@@ -11,7 +12,7 @@ from ._marks import SummaryMarks, TotalMarks, AttendaceData, ProgressData
 from ._account import AccountInfo, PupilInfo
 from ._school import SchoolInfo, ClassInfo
 from ._homework import HomeworkDay
-from .exceptions import Unauthorized, BClientException
+from ._misc import Event
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -441,7 +442,7 @@ class BClient(ClientObject):
             date (:obj:`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
 
         Returns:
-            Sequence[:obj:`BARS.DiaryDay`]: Неделя домашнего задания.
+            Sequence[:obj:`BARS.HomeworkDay`]: Неделя домашнего задания.
         """
 
         url = self.base_url + 'api/HomeworkService/GetHomeworkFromRange'
@@ -462,3 +463,32 @@ class BClient(ClientObject):
         for i, day in enumerate(result):
             result[i] = HomeworkDay.de_json(day)
         return result
+
+    @log
+    def get_events(self) -> Optional[Sequence['Event']]:
+        """Получить список текущих праздников.
+
+        Returns:
+            Sequence[:obj:`BARS.Events`], optional: Неделя домашнего задания. None если нет.
+        """
+
+        url = self.base_url + 'api/WidgetService/getEvents'
+        result = httpx.get(
+            url,
+            headers=self.headers,
+            cookies={'sessionid': self.sessionid}
+        ).json()
+
+        if isinstance(result, dict) and 'faultcode' in result.keys():
+            match result['faultcode']:
+                case 'Server.UserNotAuthenticated':
+                    raise Unauthorized('Недействительный sessionid')
+                case _:
+                    raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
+
+        try:
+            for i, event in enumerate(result):
+                result[i] = Event.de_json(event)
+            return result
+        except TypeError:
+            return None
