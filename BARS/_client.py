@@ -8,11 +8,12 @@ from ._base import ClientObject
 from ._diary import DiaryDay
 from ._schedule import DaySchedule, MonthSchedule
 from ._marks import SummaryMarks, TotalMarks, AttendaceData, ProgressData
-from ._account import AccountInfo
+from ._account import AccountInfo, PupilInfo
 from ._school import SchoolInfo, ClassInfo
 from ._homework import HomeworkDay
 from .exceptions import Unauthorized, BClientException
 
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 F = TypeVar('F', bound=Callable[..., Any])
 
@@ -79,6 +80,7 @@ class BClient(ClientObject):
 
     def __enter__(self):
         self._httpx_client = httpx.Client(proxy=self.proxy)
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._httpx_client.close()
@@ -282,6 +284,30 @@ class BClient(ClientObject):
                     raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
 
         return AccountInfo.de_json(result)
+
+    @log
+    def get_pupil_info(self) -> 'PupilInfo':
+        """Получить данные об ученике.
+
+        Returns:
+            :class:`BARS.PupilInfo`: Информация об ученике.
+        """
+
+        url = self.base_url + 'api/ProfileService/GetPersonData'
+        result = httpx.get(
+            url,
+            headers=self.headers,
+            cookies={'sessionid': self.sessionid}
+        ).json()
+
+        if 'faultcode' in result.keys():
+            match result['faultcode']:
+                case 'Server.UserNotAuthenticated':
+                    raise Unauthorized('Недействительный sessionid')
+                case _:
+                    raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
+
+        return PupilInfo.de_json(result)
 
     @log
     def get_attendace_data(self, pupilid: int, date_begin: str, date_end: str, subjectid: int = 0) -> 'AttendaceData':

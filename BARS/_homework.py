@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 from collections.abc import Sequence
-from typing import Optional
 
 from ._base import ClientObject
 
 @dataclass
 class HomeworkLesson(ClientObject):
-    """Класс, представляющий урок из дневника.
+    """Класс, представляющий урок из домашнего задания.
 
     Attributes:
         date (:obj:`str`): Дата формата Год-Месяц-День.
@@ -48,7 +47,7 @@ class HomeworkLesson(ClientObject):
             data (:obj:`dict`): Поля и значения десериализуемого объекта.
 
         Returns:
-            :class:`steam_trader.DiaryLesson`, optional: Урок из дневника.
+            :class:`steam_trader.HomeworkLesson`, optional: Урок из домашнего задания.
         """
 
         data.update({

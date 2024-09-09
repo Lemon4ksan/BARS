@@ -75,3 +75,42 @@ class AccountInfo(ClientObject):
         data = super(AccountInfo, cls).de_json(data)
 
         return cls(**data)
+
+@dataclass
+class PupilInfo(ClientObject):
+    """Класс, представляющий информацию об ученике.
+
+    """
+
+    auth_user_profile_id: int
+    children_persons: Sequence[int]
+    indicators: Sequence[dict]
+    selected_pupil_ava_url: str
+    selected_pupil_classyear: str
+    selected_pupil_id: int
+    selected_pupil_is_male: bool
+    selected_pupil_name: str
+    selected_pupil_school: str
+    user_ava_url: str
+    user_desc: str
+    user_fullname: str
+    user_has_ava: bool
+    user_is_male: bool
+
+    @classmethod
+    def de_json(
+            cls: dataclass,
+            data: dict,
+    ) -> 'PupilInfo':
+        """Десериализация объекта.
+
+        Args:
+            data (:obj:`dict`): Поля и значения десериализуемого объекта.
+
+        Returns:
+            :class:`BARS.PupilInfo`: Информация об ученике.
+        """
+
+        data = super(PupilInfo, cls).de_json(data)
+
+        return cls(**data)
