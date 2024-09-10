@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Bot exclusions
+/TelegramBot/db.json
+
 # Distribution / packaging
 .Python
 build/
