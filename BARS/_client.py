@@ -14,6 +14,7 @@ from ._school import SchoolInfo, ClassInfo
 from ._homework import HomeworkDay
 from ._misc import Event
 
+
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 F = TypeVar('F', bound=Callable[..., Any])
@@ -76,7 +77,7 @@ class BClient(ClientObject):
             }
         self.headers = headers
 
-        self._httpx_client = None
+        self._httpx_client: Optional['httpx.Client'] = None
         self.proxy = proxy
 
     def __enter__(self):
@@ -98,7 +99,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ScheduleService/GetDiary'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             params={'date': date, 'is_diary': True},
@@ -129,7 +130,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ScheduleService/GetWeekSchedule'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             params={'date': date},
@@ -160,7 +161,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ScheduleService/GetMonthSchedule'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             params={'date': date},
@@ -194,7 +195,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ScheduleService/ScheduleReport'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             params={'date': date, 'interval': interval},
@@ -222,7 +223,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/MarkService/GetSummaryMarks'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             params={'date': date},
@@ -247,7 +248,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/MarkService/GetTotalMarks'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
@@ -271,7 +272,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/MarkService/GetVisualizationData'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
@@ -295,7 +296,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ProfileService/GetPersonData'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
@@ -387,7 +388,7 @@ class BClient(ClientObject):
         return ProgressData.de_json(result)
 
     @log
-    def get_school_info(self) -> SchoolInfo:
+    def get_school_info(self) -> 'SchoolInfo':
         """Получить информацию об учебном заведении.
 
         Returns:
@@ -395,7 +396,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/SchoolService/getSchoolInfo'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
@@ -419,7 +420,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/SchoolService/getClassYearInfo'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
@@ -446,7 +447,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/HomeworkService/GetHomeworkFromRange'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             params={'date': date, 'is_diary': True},
@@ -473,7 +474,7 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/WidgetService/getEvents'
-        result = httpx.get(
+        result = (self._httpx_client or httpx).get(
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}

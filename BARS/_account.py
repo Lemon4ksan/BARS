@@ -37,12 +37,13 @@ class UnlockedDiscilpine(ClientObject):
 class AccountInfo(ClientObject):
     """Класс, представляющий информацию об аккаунте.
 
-    charts_urls (:obj:`dict`): Неизвестно.
-    disciplines (Sequence[:class:`BARS.UnlockedDiscilpine`]): Доступные предметы.
-    period_begin (:obj:`str`): Начало текущей четверт форамата Год-Месяц-День.
-    period_end (:obj:`str`): Конец текущей четверти форамата Год-Месяц-День.
-    pupilid (:obj:`int`): Идентификатор ученика.
-    student_id_param_name (:obj:`str`): Неизвестно.
+    Attributes:
+        charts_urls (:obj:`dict`): Неизвестно.
+        disciplines (Sequence[:class:`BARS.UnlockedDiscilpine`]): Доступные предметы.
+        period_begin (:obj:`str`): Начало текущей четверт форамата Год-Месяц-День.
+        period_end (:obj:`str`): Конец текущей четверти форамата Год-Месяц-День.
+        pupilid (:obj:`int`): Идентификатор ученика.
+        student_id_param_name (:obj:`str`): Неизвестно.
     """
 
     charts_urls: dict
@@ -80,6 +81,21 @@ class AccountInfo(ClientObject):
 class PupilInfo(ClientObject):
     """Класс, представляющий информацию об ученике.
 
+    Attributes:
+        auth_user_profile_id (:obj:`int`): ID аторизованного пользователя.
+        children_persons (Sequence[:obj:`int`]): Последовательность ID детей (если вы родитель).
+        indicators (Sequence[:obj:`dict`]): Последовательность со словарями индикаторов итоговых оценок.
+        selected_pupil_ava_url (:obj:`str`): Неабсолютная ссылка на изображение выбранного пользователя.
+        selected_pupil_classyear (:obj:`str`): Учебный год выбранного ученика.
+        selected_pupil_classyear (:obj:`int`): ID выбранного ученика.
+        selected_pupil_is_male (:obj:`bool`): Является ли выбранный ученик мужчиной.
+        selected_pupil_name (:obj:`str`): Имя выбранного ученика.
+        selected_pupil_school (:obj:`str`): Школа выбранного ученика.
+        user_ava_url (:obj:`str`): Неабсолютная ссылка на изображение профиля.
+        user_desc (:obj:`str`): Описание пользователя.
+        user_fullname (:obj:`str`): ФИО пользователя.
+        user_ava_url (:obj:`bool`): Есть ли у пользователя изображение профиля.
+        user_is_male (:obj:`bool`): Является ли пользователь мужчиной.
     """
 
     auth_user_profile_id: int

@@ -478,11 +478,11 @@ class BClientAsync(ClientObject):
         return result
 
     @log
-    async def get_events(self) -> Optional[Sequence['Event']]:
+    async def get_events(self) -> Sequence['Event']:
         """Получить список текущих праздников.
 
         Returns:
-            Sequence[:obj:`BARS.Events`], optional: Неделя домашнего задания. None если нет.
+            Sequence[:obj:`BARS.Events`], optional: Неделя домашнего задания.
         """
 
         url = self.base_url + 'api/WidgetService/getEvents'
@@ -490,7 +490,8 @@ class BClientAsync(ClientObject):
             url,
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
-        ).json()
+        )
+        result = result.json()
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -504,4 +505,4 @@ class BClientAsync(ClientObject):
                 result[i] = Event.de_json(event)
             return result
         except TypeError:
-            return None
+            return []

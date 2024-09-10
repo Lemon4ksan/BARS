@@ -147,7 +147,7 @@ class TotalDisciplineMarks(ClientObject):
 
     Attributes:
         discipline (:obj:`str`): Название урока.
-        period_marks (Sequence[:class:`BARS.Mark`]): Последовательность оценок в четверти.
+        period_marks (Sequence[:class:`BARS.Mark`]): Последовательность оценок в четвертях.
     """
 
     discipline: str
@@ -176,7 +176,12 @@ class TotalDisciplineMarks(ClientObject):
 
 @dataclass
 class TotalMarks(ClientObject):
-    """Класс, представляющий информацию об итоговых оценках."""
+    """Класс, представляющий информацию об итоговых оценках.
+
+    Attributes:
+        discipline_marks (Sequence[:class:`TotalDisciplineMarks`]): Последовательность соответствующих предметов
+        subperiods (Sequence[:class:`Subperiod`]): Последовательность четвертей
+    """
 
     discipline_marks: Sequence['TotalDisciplineMarks']
     subperiods: Sequence['Subperiod']
@@ -249,7 +254,7 @@ class SeriesItem(ClientObject):
 
     Attributes:
         color (:obj:`str`): HEX код цвета.
-        data (Sequence[:obj:`int`]): Оценки на графике.
+        data (Sequence[:obj:`int`]): Оценки на графике. Среднее арифметическое.
         name (:obj:`str`): Название пункта.
         point_width (:obj:`str`): Ширина точки в пикселях.
     """

@@ -1,4 +1,4 @@
-class BClientException(BaseException):
+class BClientException(Exception):
     """Базовый класс исключегий."""
 
 class Unauthorized(BClientException):
