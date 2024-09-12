@@ -12,7 +12,7 @@ from ._marks import SummaryMarks, TotalMarks, AttendaceData, ProgressData
 from ._account import AccountInfo, PupilInfo
 from ._school import SchoolInfo, ClassInfo
 from ._homework import HomeworkDay
-from ._misc import Event
+from ._misc import Event, Birthday
 
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -412,7 +412,7 @@ class BClient(ClientObject):
         return SchoolInfo.de_json(result)
 
     @log
-    def get_class_info(self):
+    def get_class_info(self) -> 'ClassInfo':
         """Получить информацию о классе.
 
         Returns:
@@ -470,7 +470,7 @@ class BClient(ClientObject):
         """Получить список текущих праздников.
 
         Returns:
-            Sequence[:obj:`BARS.Events`], optional: Неделя домашнего задания. None если нет.
+            Sequence[:obj:`BARS.Event`], optional: Список текущих праздников. None если нет.
         """
 
         url = self.base_url + 'api/WidgetService/getEvents'
@@ -490,6 +490,35 @@ class BClient(ClientObject):
         try:
             for i, event in enumerate(result):
                 result[i] = Event.de_json(event)
+            return result
+        except TypeError:
+            return None
+
+    @log
+    def get_birthdays(self) -> Optional[Sequence['Birthday']]:
+        """Получить список текущих дней рождений.
+
+        Returns:
+            Sequence[:obj:`BARS.Birthday`], optional: Список текущих дней рождений. None если нет.
+        """
+
+        url = self.base_url + 'api/WidgetService/getBirthdays'
+        result = (self._httpx_client or httpx).get(
+            url,
+            headers=self.headers,
+            cookies={'sessionid': self.sessionid}
+        ).json()
+
+        if isinstance(result, dict) and 'faultcode' in result.keys():
+            match result['faultcode']:
+                case 'Server.UserNotAuthenticated':
+                    raise Unauthorized('Недействительный sessionid')
+                case _:
+                    raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
+
+        try:
+            for i, birthday in enumerate(result):
+                result[i] = Birthday.de_json(birthday)
             return result
         except TypeError:
             return None

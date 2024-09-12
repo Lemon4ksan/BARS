@@ -25,12 +25,14 @@ from ._school import Employee
 from ._marks import SummaryMarks
 from ._marks import Mark
 from ._marks import TotalMarks
-from ._marks import TotalDisciplineMarks
-from ._marks import SummaryDisciplineMarks
+from ._marks import TotalMarksDiscipline
+from ._marks import SummaryMarksDiscipline
 from ._marks import AttendaceData
 from ._marks import ProgressData
+from ._marks import Subperiod
 
 from ._misc import Event
+from ._misc import Birthday
 
 __all__ = [
     'ClientObject',
@@ -53,9 +55,11 @@ __all__ = [
     'SummaryMarks',
     'Mark',
     'TotalMarks',
-    'TotalDisciplineMarks',
-    'SummaryDisciplineMarks',
+    'TotalMarksDiscipline',
+    'SummaryMarksDiscipline',
     'AttendaceData',
     'ProgressData',
-    'Event'
+    'Event',
+    'Birthday',
+    'Subperiod'
 ]

@@ -12,7 +12,7 @@ from ._marks import SummaryMarks, TotalMarks, AttendaceData, ProgressData
 from ._account import AccountInfo, PupilInfo
 from ._school import SchoolInfo, ClassInfo
 from ._homework import HomeworkDay
-from ._misc import Event
+from ._misc import Event, Birthday
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -476,6 +476,36 @@ class BClientAsync(ClientObject):
         for i, day in enumerate(result):
             result[i] = HomeworkDay.de_json(day)
         return result
+
+    @log
+    async def get_birthdays(self) -> Optional[Sequence['Birthday']]:
+        """Получить список текущих дней рождений.
+
+        Returns:
+            Sequence[:obj:`BARS.Birthday`], optional: Список текущих дней рождений. None если нет.
+        """
+
+        url = self.base_url + 'api/WidgetService/getBirthdays'
+        result = await self._httpx_client.get(
+            url,
+            headers=self.headers,
+            cookies={'sessionid': self.sessionid}
+        )
+        result = result.json()
+
+        if isinstance(result, dict) and 'faultcode' in result.keys():
+            match result['faultcode']:
+                case 'Server.UserNotAuthenticated':
+                    raise Unauthorized('Недействительный sessionid')
+                case _:
+                    raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
+
+        try:
+            for i, birthday in enumerate(result):
+                result[i] = Birthday.de_json(birthday)
+            return result
+        except TypeError:
+            return None
 
     @log
     async def get_events(self) -> Sequence['Event']:
