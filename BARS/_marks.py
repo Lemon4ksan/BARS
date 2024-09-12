@@ -38,7 +38,7 @@ class Mark(ClientObject):
         return cls(**data)
 
 @dataclass
-class SummaryDisciplineMarks(ClientObject):
+class SummaryMarksDiscipline(ClientObject):
     """Класс, представляющий данные урока из сводной.
 
     Attributes:
@@ -55,14 +55,14 @@ class SummaryDisciplineMarks(ClientObject):
     def de_json(
             cls: dataclass,
             data: dict,
-    ) -> 'SummaryDisciplineMarks':
+    ) -> 'SummaryMarksDiscipline':
         """Десериализация объекта.
 
         Args:
             data (:obj:`dict`): Поля и значения десериализуемого объекта.
 
         Returns:
-            :class:`BARS.SummaryDisciplineMarks`: Данные урока из сводной.
+            :class:`BARS.SummaryMarksDiscipline`: Данные урока из сводной.
         """
 
         data['average_mark'] = float(data['average_mark'])
@@ -70,7 +70,7 @@ class SummaryDisciplineMarks(ClientObject):
         for i, mark in enumerate(data['marks']):
             data['marks'][i] = Mark.de_json(mark)
 
-        data = super(SummaryDisciplineMarks, cls).de_json(data)
+        data = super(SummaryMarksDiscipline, cls).de_json(data)
 
         return cls(**data)
 
@@ -110,12 +110,12 @@ class SummaryMarks(ClientObject):
 
     Attributes:
         dates (Sequence[:obj:`str`]): Даты из сводной.
-        discipline_marks (Sequence[:class:`BARS.SummaryDisciplineMarks`]): Данные об уроке из сводной.
+        disciplines (Sequence[:class:`BARS.SummaryMarksDiscipline`]): Последовательность уроков из сводной.
         subperiod (:class:`BARS.Subperiod`): Информация о четверти.
     """
 
     dates: Sequence[str]
-    discipline_marks: Sequence['SummaryDisciplineMarks']
+    disciplines: Sequence['SummaryMarksDiscipline']
     subperiod: Subperiod
 
     @classmethod
@@ -132,8 +132,11 @@ class SummaryMarks(ClientObject):
             :class:`steam_trader.DiaryLesson`, optional: Урок из дневника.
         """
 
-        for i, item in enumerate(data['discipline_marks']):
-            data['discipline_marks'][i] = SummaryDisciplineMarks.de_json(item)
+        data['disciplines'] = data['discipline_marks']
+        del data['discipline_marks']
+
+        for i, item in enumerate(data['disciplines']):
+            data['disciplines'][i] = SummaryMarksDiscipline.de_json(item)
 
         data['subperiod'] = Subperiod.de_json(data['subperiod'])
 
@@ -142,7 +145,7 @@ class SummaryMarks(ClientObject):
         return cls(**data)
 
 @dataclass
-class TotalDisciplineMarks(ClientObject):
+class TotalMarksDiscipline(ClientObject):
     """Класс, представляющий данные урока из сводной.
 
     Attributes:
@@ -157,20 +160,20 @@ class TotalDisciplineMarks(ClientObject):
     def de_json(
             cls: dataclass,
             data: dict,
-    ) -> 'TotalDisciplineMarks':
+    ) -> 'TotalMarksDiscipline':
         """Десериализация объекта.
 
         Args:
             data (:obj:`dict`): Поля и значения десериализуемого объекта.
 
         Returns:
-            :class:`BARS.TotalDisciplineMarks`: Данные урока из сводной.
+            :class:`BARS.TotalMarksDiscipline`: Данные урока из сводной.
         """
 
         for i, mark in enumerate(data['period_marks']):
             data['period_marks'][i] = int(data['period_marks'][i])
 
-        data = super(TotalDisciplineMarks, cls).de_json(data)
+        data = super(TotalMarksDiscipline, cls).de_json(data)
 
         return cls(**data)
 
@@ -179,11 +182,11 @@ class TotalMarks(ClientObject):
     """Класс, представляющий информацию об итоговых оценках.
 
     Attributes:
-        discipline_marks (Sequence[:class:`TotalDisciplineMarks`]): Последовательность соответствующих предметов
+        disciplines (Sequence[:class:`TotalMarksDiscipline`]): Последовательность соответствующих предметов
         subperiods (Sequence[:class:`Subperiod`]): Последовательность четвертей
     """
 
-    discipline_marks: Sequence['TotalDisciplineMarks']
+    disciplines: Sequence['TotalMarksDiscipline']
     subperiods: Sequence['Subperiod']
 
     @classmethod
@@ -200,11 +203,14 @@ class TotalMarks(ClientObject):
             :class:`steam_trader.Subperiod`, optional: Информация о четверти.
         """
 
-        for i, mark in enumerate(data['discipline_marks']):
-            data['discipline_marks'][i] = TotalDisciplineMarks.de_json(mark)
+        data['disciplines'] = data['discipline_marks']
+        del data['discipline_marks']
+
+        for i, mark in enumerate(data['disciplines']):
+            data['disciplines'][i] = TotalMarksDiscipline.de_json(mark)
 
         for i, subperiod in enumerate(data['subperiods']):
-            data['subperiods'] = Subperiod.de_json(subperiod)
+            data['subperiods'][i] = Subperiod.de_json(subperiod)
 
         data = super(TotalMarks, cls).de_json(data)
 
