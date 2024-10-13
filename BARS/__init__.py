@@ -14,8 +14,8 @@ from ._account import PupilInfo
 from ._account import UnlockedDiscilpine
 
 from ._schedule import ScheduleLesson
-from ._schedule import DaySchedule
-from ._schedule import MonthSchedule
+from ._schedule import ScheduleDay
+from ._schedule import ScheduleMonth
 
 from ._school import SchoolInfo
 from ._school import ClassInfo
@@ -46,8 +46,8 @@ __all__ = [
     'PupilInfo',
     'UnlockedDiscilpine',
     'ScheduleLesson',
-    'DaySchedule',
-    'MonthSchedule',
+    'ScheduleDay',
+    'ScheduleMonth',
     'SchoolInfo',
     'ClassInfo',
     'Pupil',

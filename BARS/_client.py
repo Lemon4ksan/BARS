@@ -7,7 +7,7 @@ from typing import Optional, LiteralString, TypeVar, Any
 from .exceptions import Unauthorized, BClientException
 from ._base import ClientObject
 from ._diary import DiaryDay
-from ._schedule import DaySchedule, MonthSchedule
+from ._schedule import ScheduleDay, ScheduleMonth
 from ._marks import SummaryMarks, TotalMarks, AttendaceData, ProgressData
 from ._account import AccountInfo, PupilInfo
 from ._school import SchoolInfo, ClassInfo
@@ -119,7 +119,7 @@ class BClient(ClientObject):
         return return_data
 
     @log
-    def get_week_schedule(self, date: str) -> Sequence['DaySchedule']:
+    def get_week_schedule(self, date: str) -> Sequence['ScheduleDay']:
         """Получить данные из вкладки 'Расписание > Неделя'.
 
         Args:
@@ -146,18 +146,18 @@ class BClient(ClientObject):
 
         return_data = []
         for day in result['days']:
-            return_data.append(DaySchedule.de_json(day))
+            return_data.append(ScheduleDay.de_json(day))
         return return_data
 
     @log
-    def get_month_schedule(self, date: str) -> Sequence['MonthSchedule']:
+    def get_month_schedule(self, date: str) -> Sequence['ScheduleMonth']:
         """Получить данные из вкладки 'Расписание > Месяц'.
 
         Args:
             date (:obj:`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
 
         Returns:
-            Sequence[:obj:`BARS.MonthSchedule`]: Расписание на месяц.
+            Sequence[:obj:`BARS.ScheduleMonth`]: Расписание на месяц.
         """
 
         url = self.base_url + 'api/ScheduleService/GetMonthSchedule'
@@ -177,7 +177,7 @@ class BClient(ClientObject):
 
         return_data = []
         for month in result:
-            return_data.append(MonthSchedule.de_json(month))
+            return_data.append(ScheduleMonth.de_json(month))
         return return_data
 
     @log

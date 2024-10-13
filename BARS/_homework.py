@@ -8,7 +8,7 @@ class HomeworkLesson(ClientObject):
     """Класс, представляющий урок из домашнего задания.
 
     Attributes:
-        date (:obj:`str`): Дата формата Год-Месяц-День.
+        date (:obj:`str`): Дата формата День-Месяц-Год.
         discipline (:obj:`str`): Название урока.
         homework (:obj:`str`): Домашнее задание.
         homework_time_to_complete (:obj:`int`): Время на выполнения д/з.
@@ -27,7 +27,7 @@ class HomeworkLesson(ClientObject):
     homework: str
     homework_time_to_complete: int
     individual_homeworks: Sequence[str]
-    materials: Sequence[str]
+    materials: Sequence[dict[str, str]]
     next_homework: str
     next_individual_homeworks: Sequence[str]
     next_materials: Sequence[str]
@@ -56,6 +56,8 @@ class HomeworkLesson(ClientObject):
             'next_individual_homeworks': data['nextIndividualHomeworks'],
             'next_materials': data['nextMaterials']
         })
+        del data['individualHomeworks'], data['nextHomework'], data['nextIndividualHomeworks'], data['nextMaterials']
+        # TODO: Это надо добавить
 
         data = super(HomeworkLesson, cls).de_json(data)
 
@@ -67,7 +69,7 @@ class HomeworkDay(ClientObject):
 
     Attributes:
         date (:obj:`str`): Дата формата Год-Месяц-День.
-        homeworks (Sequence[:class:`BARS.HomeworkLesson`]): ДЗ на этот день.
+        homeworks (Sequence[:class:`BARS.HomeworkLesson`]): Д/З на этот день.
         name (:obj:`str`): Название дня недели.
     """
 

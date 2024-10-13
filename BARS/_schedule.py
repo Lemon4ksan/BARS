@@ -10,7 +10,7 @@ class ScheduleLesson(ClientObject):
 
     Attributes:
         id (:obj:`int`, optional): Уникальный идентификатор задания. Может быть пустым.
-        date (:obj:`str`): Дата формата Год-Месяц-День.
+        date (:obj:`str`): Дата формата День-Месяц-Год.
         discipline (:obj:`str`): Название урока.
         has_auth_sferum (:obj:`bool`, optional): Есть ли регистрация в Сферум. Может быть пустым.
         index (:obj:`int`): Порядок урока в расписании.
@@ -54,7 +54,7 @@ class ScheduleLesson(ClientObject):
 
         return cls(**data)
 @dataclass
-class DaySchedule(ClientObject):
+class ScheduleDay(ClientObject):
     """Класс, представляющий расписание на день.
 
         Attributes:
@@ -73,7 +73,7 @@ class DaySchedule(ClientObject):
     def de_json(
             cls: dataclass,
             data: dict,
-    ) -> 'DaySchedule':
+    ) -> 'ScheduleDay':
         """Десериализация объекта.
 
         Args:
@@ -87,28 +87,28 @@ class DaySchedule(ClientObject):
             for i, lesson in enumerate(data['lessons']):
                 data['lessons'][i] = ScheduleLesson.de_json(lesson)
         except KeyError:
-            data['lessons'] = None
-        data = super(DaySchedule, cls).de_json(data)
+            data['lessons'] = []
+        data = super(ScheduleDay, cls).de_json(data)
 
         return cls(**data)
 
 @dataclass
-class MonthSchedule(ClientObject):
+class ScheduleMonth(ClientObject):
     """Класс, представляющий расписание на день.
 
         Attributes:
-            days (Sequence[:class:`BARS.DaySchedule`]): Последовательность дней недели.
+            days (Sequence[:class:`BARS.ScheduleDay`]): Последовательность дней недели.
             index (:obj:`int`): Порядок недели.
     """
 
-    days: Sequence['DaySchedule']
+    days: Sequence['ScheduleDay']
     index: int
 
     @classmethod
     def de_json(
             cls: dataclass,
             data: dict,
-    ) -> 'MonthSchedule':
+    ) -> 'ScheduleMonth':
         """Десериализация объекта.
 
         Args:
@@ -119,8 +119,8 @@ class MonthSchedule(ClientObject):
         """
 
         for i, day in enumerate(data['days']):
-            data['days'][i] = DaySchedule.de_json(day)
+            data['days'][i] = ScheduleDay.de_json(day)
 
-        data = super(MonthSchedule, cls).de_json(data)
+        data = super(ScheduleMonth, cls).de_json(data)
 
         return cls(**data)
