@@ -11,8 +11,9 @@ from handlers import handle_callback, handle_exception, handle_message
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.WARNING)
     logging.getLogger('httpx').setLevel(logging.WARNING)
+    logging.getLogger('BARS').setLevel(logging.WARNING)
     coloredlogs.install()
 
     load_dotenv()
