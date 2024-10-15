@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 from ._base import ClientObject
 
-@dataclass
+@dataclass(slots=True)
 class HomeworkLesson(ClientObject):
     """Класс, представляющий урок из домашнего задания.
 
@@ -41,14 +41,6 @@ class HomeworkLesson(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'HomeworkLesson':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.HomeworkLesson`, optional: Урок из домашнего задания.
-        """
 
         data.update({
             'individual_homeworks': data['individualHomeworks'],
@@ -63,7 +55,7 @@ class HomeworkLesson(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class HomeworkDay(ClientObject):
     """Класс, представляющий день из дневника.
 
@@ -82,14 +74,6 @@ class HomeworkDay(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'HomeworkDay':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.HomeworkDay`, optional: День домашнего задания.
-        """
 
         for i, homework in enumerate(data['homeworks']):
             data['homeworks'][i] = HomeworkLesson.de_json(homework)

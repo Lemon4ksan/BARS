@@ -4,7 +4,7 @@ from typing import Optional
 
 from ._base import ClientObject
 
-@dataclass
+@dataclass(slots=True)
 class ScheduleLesson(ClientObject):
     """Класс, представляющий урок из дневника.
 
@@ -41,27 +41,20 @@ class ScheduleLesson(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'ScheduleLesson':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.DiaryLesson`, optional: Урок из дневника.
-        """
 
         data = super(ScheduleLesson, cls).de_json(data)
 
         return cls(**data)
-@dataclass
+
+@dataclass(slots=True)
 class ScheduleDay(ClientObject):
     """Класс, представляющий расписание на день.
 
-        Attributes:
-            date (:obj:`str`): Дата формата Год-Месяц-День.
-            lessons (Sequence[:class:`BARS.DiaryLesson`, optional], optional): Уроки на этот день.
-                None, если выходной или каникулы.
-            is_weekend (:obj:`bool`): Является ли данный день выходным.
+    Attributes:
+        date (:obj:`str`): Дата формата Год-Месяц-День.
+        lessons (Sequence[:class:`BARS.DiaryLesson`, optional], optional): Уроки на этот день.
+            None, если выходной или каникулы.
+        is_weekend (:obj:`bool`): Является ли данный день выходным.
         """
 
     date: str
@@ -74,15 +67,6 @@ class ScheduleDay(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'ScheduleDay':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.DiaryDay`, optional: День из дневника.
-        """
-
         try:
             for i, lesson in enumerate(data['lessons']):
                 data['lessons'][i] = ScheduleLesson.de_json(lesson)
@@ -92,13 +76,13 @@ class ScheduleDay(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class ScheduleMonth(ClientObject):
     """Класс, представляющий расписание на день.
 
-        Attributes:
-            days (Sequence[:class:`BARS.ScheduleDay`]): Последовательность дней недели.
-            index (:obj:`int`): Порядок недели.
+    Attributes:
+        days (Sequence[:class:`BARS.ScheduleDay`]): Последовательность дней недели.
+        index (:obj:`int`): Порядок недели.
     """
 
     days: Sequence['ScheduleDay']
@@ -109,14 +93,6 @@ class ScheduleMonth(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'ScheduleMonth':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.DiaryDay`, optional: День из дневника.
-        """
 
         for i, day in enumerate(data['days']):
             data['days'][i] = ScheduleDay.de_json(day)

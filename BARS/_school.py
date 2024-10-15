@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 from ._base import ClientObject
 
-@dataclass
+@dataclass(slots=True)
 class Employee(ClientObject):
     """Класс, представляющий данные работника учебного заведения.
 
@@ -41,7 +41,7 @@ class Employee(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class SchoolInfo(ClientObject):
     """Класс, представляющий данные об учебном заведении.
 
@@ -74,14 +74,6 @@ class SchoolInfo(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'SchoolInfo':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.SchoolInfo`: Данный об учебном заведении.
-        """
 
         for i, employee in enumerate(data['employees']):
             data['employees'][i] = Employee.de_json(employee)
@@ -90,7 +82,7 @@ class SchoolInfo(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class Pupil(ClientObject):
     """Класс, представляющий данные ученика.
 
@@ -109,20 +101,12 @@ class Pupil(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'Pupil':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.Pupil`: Данные ученика.
-        """
 
         data = super(Pupil, cls).de_json(data)
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class ClassInfo(ClientObject):
     """Класс, представляющий данные о классе.
 
@@ -151,14 +135,6 @@ class ClassInfo(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'ClassInfo':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.ClassInfo`: Данный о классе.
-        """
 
         for i, pupil in enumerate(data['pupils']):
             data['pupils'][i] = Pupil.de_json(pupil)

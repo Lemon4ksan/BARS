@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from ._base import ClientObject
 
-@dataclass
+@dataclass(slots=True)
 class Event(ClientObject):
     """Класс, представляющий праздник.
 
@@ -21,20 +21,12 @@ class Event(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'Event':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.Event`: Праздник.
-        """
 
         data = super(Event, cls).de_json(data)
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class Birthday(ClientObject):
     """Класс, представляющий день рождения.
 
@@ -55,14 +47,6 @@ class Birthday(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'Birthday':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.Birthday`: День рождения.
-        """
 
         data = super(Birthday, cls).de_json(data)
 

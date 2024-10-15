@@ -4,7 +4,7 @@ from typing import Optional
 
 from ._base import ClientObject
 
-@dataclass
+@dataclass(slots=True)
 class DiaryLesson(ClientObject):
     """Класс, представляющий урок из дневника.
 
@@ -60,20 +60,12 @@ class DiaryLesson(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'DiaryLesson':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.DiaryLesson`, optional: Урок из дневника.
-        """
 
         data = super(DiaryLesson, cls).de_json(data)
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class DiaryDay(ClientObject):
     """Класс, представляющий день из дневника.
 
@@ -94,14 +86,6 @@ class DiaryDay(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'DiaryDay':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.DiaryDay`, optional: День из дневника.
-        """
 
         try:
             for i, lesson in enumerate(data['lessons']):

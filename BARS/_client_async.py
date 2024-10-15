@@ -1,10 +1,11 @@
+import json
 import httpx
 import logging
 import functools
 from collections.abc import Sequence, Callable
 from typing import Optional, LiteralString, TypeVar, Any
 
-from .exceptions import Unauthorized, BClientException
+from .exceptions import Unauthorized, BClientException, InternalError
 from ._base import ClientObject
 from ._diary import DiaryDay
 from ._schedule import ScheduleDay, ScheduleMonth
@@ -104,7 +105,10 @@ class BClientAsync(ClientObject):
             params={'date': date, 'is_diary': True},
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -136,7 +140,10 @@ class BClientAsync(ClientObject):
             params={'date': date},
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -168,7 +175,10 @@ class BClientAsync(ClientObject):
             params={'date': date},
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -203,7 +213,10 @@ class BClientAsync(ClientObject):
             params={'date': date, 'interval': interval},
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -232,7 +245,10 @@ class BClientAsync(ClientObject):
             params={'date': date},
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -257,7 +273,10 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -282,7 +301,10 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -307,7 +329,10 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -346,7 +371,10 @@ class BClientAsync(ClientObject):
             },
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -385,7 +413,10 @@ class BClientAsync(ClientObject):
             },
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -410,7 +441,10 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -435,7 +469,10 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -464,7 +501,10 @@ class BClientAsync(ClientObject):
             params={'date': date, 'is_diary': True},
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -491,7 +531,10 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -521,7 +564,10 @@ class BClientAsync(ClientObject):
             headers=self.headers,
             cookies={'sessionid': self.sessionid}
         )
-        result = result.json()
+        try:
+            result = result.json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:

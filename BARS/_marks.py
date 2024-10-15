@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 from ._base import ClientObject
 
-@dataclass
+@dataclass(slots=True)
 class Mark(ClientObject):
     """Класс, представляющий данные оценки.
 
@@ -22,14 +22,6 @@ class Mark(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'Mark':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.Mark`: Данные оценки.
-        """
 
         data['mark'] = int(data['mark'])
 
@@ -37,7 +29,7 @@ class Mark(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class SummaryMarksDiscipline(ClientObject):
     """Класс, представляющий данные урока из сводной.
 
@@ -56,14 +48,6 @@ class SummaryMarksDiscipline(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'SummaryMarksDiscipline':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.SummaryMarksDiscipline`: Данные урока из сводной.
-        """
 
         data['average_mark'] = float(data['average_mark'])
 
@@ -74,7 +58,7 @@ class SummaryMarksDiscipline(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class Subperiod(ClientObject):
     """Класс, представляющий информацию о четверти.
 
@@ -91,20 +75,12 @@ class Subperiod(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'Subperiod':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.Subperiod`, optional: Информация о четверти.
-        """
 
         data = super(Subperiod, cls).de_json(data)
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class SummaryMarks(ClientObject):
     """Класс, представляющий данные о сводных оценках.
 
@@ -123,14 +99,6 @@ class SummaryMarks(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'SummaryMarks':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.DiaryLesson`, optional: Урок из дневника.
-        """
 
         data['disciplines'] = data['discipline_marks']
         del data['discipline_marks']
@@ -144,7 +112,7 @@ class SummaryMarks(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class TotalMarksDiscipline(ClientObject):
     """Класс, представляющий данные урока из сводной.
 
@@ -161,14 +129,6 @@ class TotalMarksDiscipline(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'TotalMarksDiscipline':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.TotalMarksDiscipline`: Данные урока из сводной.
-        """
 
         for i, mark in enumerate(data['period_marks']):
             data['period_marks'][i] = int(data['period_marks'][i])
@@ -177,7 +137,7 @@ class TotalMarksDiscipline(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class TotalMarks(ClientObject):
     """Класс, представляющий информацию об итоговых оценках.
 
@@ -194,14 +154,6 @@ class TotalMarks(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'TotalMarks':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`steam_trader.Subperiod`, optional: Информация о четверти.
-        """
 
         data['disciplines'] = data['discipline_marks']
         del data['discipline_marks']
@@ -216,7 +168,7 @@ class TotalMarks(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class AttendaceData(ClientObject):
     """Класс, представляющий отсчёт о посещаемиости.
 
@@ -241,20 +193,12 @@ class AttendaceData(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'AttendaceData':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.AttendaceData`: Отсчёт о посещаемости.
-        """
 
         data = super(AttendaceData, cls).de_json(data)
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class SeriesItem(ClientObject):
     """Класс, представляющий график оценок.
 
@@ -275,14 +219,6 @@ class SeriesItem(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'SeriesItem':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.SeriesItem`: График оценок.
-        """
 
         data['point_width'] = data['pointWidth']
         del data['pointWidth']
@@ -291,7 +227,7 @@ class SeriesItem(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class ProgressData(ClientObject):
     """Класс, представляющий данные об успеваемости.
 
@@ -312,14 +248,6 @@ class ProgressData(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'ProgressData':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.ProgressData`: Данные об успеваемости.
-        """
 
         for i, item in enumerate(data['series']):
             data['series'][i] = SeriesItem.de_json(item)

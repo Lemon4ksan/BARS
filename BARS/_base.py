@@ -1,14 +1,11 @@
 import dataclasses
 import logging
-import keyword
-import json
 import re
+from bs4 import BeautifulSoup
 from abc import ABCMeta
 from dataclasses import dataclass
-from typing import Any, Optional, TypeVar
+from typing import Optional, TypeVar
 from collections.abc import MutableSequence
-
-reserved_names = keyword.kwlist
 
 _BT = TypeVar('_BT')
 
@@ -19,6 +16,7 @@ class ClientObject:
 
     def remove_html_tags(self, __obj: _BT = '__dataclass__', *, replace_p_with='\n') -> _BT:
         """Преобразует словари, изменяемые последовательности, классы и строки в читабельный формат, без HTML тегов.
+        Также заменяет теги <a> на гиперссылки для отправки в Телеграм.
 
         Аргумент ``replace_p_with`` заменяет теги <p> на введённый символ. По умолчанию новая строка.
 
@@ -29,6 +27,10 @@ class ClientObject:
             __obj = self
 
         if isinstance(__obj, str):
+            links = re.findall(r'<a href="[^"]+">.+[</a>]', __obj)
+            for link in links:  # Заменяет теги <a> на гиперссылки
+                tag = BeautifulSoup(link, 'lxml').find('a')
+                __obj = __obj.replace(link, f'[{tag.text}]({tag.get('href')}) ')
             __obj = re.sub(r'<[^>]+>', '', __obj.replace('<p', f'{replace_p_with}<p'))
             if replace_p_with == ' ':
                 __obj = __obj.replace('  ', ' ')  # исключаем двойные <p>
@@ -73,55 +75,3 @@ class ClientObject:
             logging.warning(f'Были получены неизвестные аттриубты для класса {cls} :: {unknown_data}')
 
         return cleaned_data
-
-    def to_json(self, for_request: bool = False) -> str:
-        """Сериализация объекта.
-
-        Args:
-            for_request (:obj:`bool`): Подготовить ли объект для отправки в теле запроса.
-
-        Returns:
-            :obj:`str`: Сериализованный в JSON объект.
-        """
-        return json.dumps(self.to_dict(for_request), ensure_ascii=False)
-
-    def to_dict(self, for_request: bool = False) -> dict:
-        """Рекурсивная сериализация объекта.
-
-        Args:
-            for_request (:obj:`bool`): Перевести ли обратно все поля в camelCase и игнорировать зарезервированные слова.
-
-        Note:
-            Исключает из сериализации `client` и `_id_attrs` необходимые в `__eq__`.
-
-            К зарезервированным словам добавляет "_" в конец.
-
-        Returns:
-            :obj:`dict`: Сериализованный в dict объект.
-        """
-
-        def parse(val: Any) -> Any:
-            if hasattr(val, 'to_dict'):
-                return val.to_dict(for_request)
-            if isinstance(val, list):
-                return [parse(it) for it in val]
-            if isinstance(val, dict):
-                return {key: parse(value) for key, value in val.items()}
-            return val
-
-        data = self.__dict__.copy()
-
-        if for_request:
-            for k, v in data.copy().items():
-                camel_case = ''.join(word.title() for word in k.split('_'))
-                camel_case = camel_case[0].lower() + camel_case[1:]
-
-                data.pop(k)
-                data.update({camel_case: v})
-        else:
-            for k, v in data.copy().items():
-                if k.lower() in reserved_names:
-                    data.pop(k)
-                    data.update({f'{k}_': v})
-
-        return parse(data)

@@ -1,10 +1,11 @@
+import json
 import httpx
 import logging
 import functools
 from collections.abc import Sequence, Callable
 from typing import Optional, LiteralString, TypeVar, Any
 
-from .exceptions import Unauthorized, BClientException
+from .exceptions import Unauthorized, BClientException, InternalError
 from ._base import ClientObject
 from ._diary import DiaryDay
 from ._schedule import ScheduleDay, ScheduleMonth
@@ -99,12 +100,15 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ScheduleService/GetDiary'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            params={'date': date, 'is_diary': True},
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                params={'date': date, 'is_diary': True},
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -130,12 +134,15 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ScheduleService/GetWeekSchedule'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            params={'date': date},
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                params={'date': date},
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -161,12 +168,15 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ScheduleService/GetMonthSchedule'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            params={'date': date},
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                params={'date': date},
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -195,12 +205,15 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ScheduleService/ScheduleReport'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            params={'date': date, 'interval': interval},
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                params={'date': date, 'interval': interval},
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -223,12 +236,15 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/MarkService/GetSummaryMarks'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            params={'date': date},
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                params={'date': date},
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -248,11 +264,14 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/MarkService/GetTotalMarks'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -272,11 +291,14 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/MarkService/GetVisualizationData'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -296,11 +318,14 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/ProfileService/GetPersonData'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -328,17 +353,20 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'actions/web_edu.core.pupil.chart.ChartPack/attendancedata'
-        result = httpx.post(
-            url,
-            headers=self.headers,
-            data={
-                'web_edu.plugins.corrective_school.corrective_card.actions.StudentPack_id': pupilid,
-                'subject': subjectid,
-                'date_begin': date_begin,
-                'date_end': date_end
-            },
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = httpx.post(
+                url,
+                headers=self.headers,
+                data={
+                    'web_edu.plugins.corrective_school.corrective_card.actions.StudentPack_id': pupilid,
+                    'subject': subjectid,
+                    'date_begin': date_begin,
+                    'date_end': date_end
+                },
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -366,17 +394,20 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'actions/web_edu.core.pupil.chart.ChartPack/progressdata'
-        result = httpx.post(
-            url,
-            headers=self.headers,
-            data={
-                'web_edu.plugins.corrective_school.corrective_card.actions.StudentPack_id': pupilid,
-                'subject': subjectid,
-                'date_begin': date_begin,
-                'date_end': date_end
-            },
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = httpx.post(
+                url,
+                headers=self.headers,
+                data={
+                    'web_edu.plugins.corrective_school.corrective_card.actions.StudentPack_id': pupilid,
+                    'subject': subjectid,
+                    'date_begin': date_begin,
+                    'date_end': date_end
+                },
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -396,11 +427,14 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/SchoolService/getSchoolInfo'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -420,11 +454,14 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/SchoolService/getClassYearInfo'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if 'faultcode' in result.keys():
             match result['faultcode']:
@@ -447,12 +484,15 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/HomeworkService/GetHomeworkFromRange'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            params={'date': date, 'is_diary': True},
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                params={'date': date, 'is_diary': True},
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -474,11 +514,14 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/WidgetService/getEvents'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
@@ -503,11 +546,14 @@ class BClient(ClientObject):
         """
 
         url = self.base_url + 'api/WidgetService/getBirthdays'
-        result = (self._httpx_client or httpx).get(
-            url,
-            headers=self.headers,
-            cookies={'sessionid': self.sessionid}
-        ).json()
+        try:
+            result = (self._httpx_client or httpx).get(
+                url,
+                headers=self.headers,
+                cookies={'sessionid': self.sessionid}
+            ).json()
+        except json.JSONDecodeError:
+            raise InternalError('В данный момент сайт недоступен.')
 
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:

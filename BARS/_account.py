@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 from ._base import ClientObject
 
-@dataclass
+@dataclass(slots=True)
 class UnlockedDiscilpine(ClientObject):
     """Класс, представляющий доступную дисциплину.
 
@@ -20,20 +20,12 @@ class UnlockedDiscilpine(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'UnlockedDiscilpine':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.Mark`: Доступная дисциплина.
-        """
 
         data = super(UnlockedDiscilpine, cls).de_json(data)
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class AccountInfo(ClientObject):
     """Класс, представляющий информацию об аккаунте.
 
@@ -58,14 +50,6 @@ class AccountInfo(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'AccountInfo':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.AccountInfo`: Информация об аккаунте.
-        """
 
         data['pupilid'] = data['pupil_id']
         del data['pupil_id']
@@ -77,7 +61,7 @@ class AccountInfo(ClientObject):
 
         return cls(**data)
 
-@dataclass
+@dataclass(slots=True)
 class PupilInfo(ClientObject):
     """Класс, представляющий информацию об ученике.
 
@@ -118,14 +102,6 @@ class PupilInfo(ClientObject):
             cls: dataclass,
             data: dict,
     ) -> 'PupilInfo':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.PupilInfo`: Информация об ученике.
-        """
 
         data = super(PupilInfo, cls).de_json(data)
 
