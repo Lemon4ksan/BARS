@@ -58,19 +58,22 @@ ATTENDANCE_TEMPLATE: str = """Пропущено: {}
 По неуважительной причине: {}
 По болезни: {}"""
 
-DIARY_BUTTONS: Sequence['InlineKeyboardButton'] = [
-    InlineKeyboardButton(text='Предыдущий день', callback_data='diary_previous_day'),
-    InlineKeyboardButton(text='Следующий день', callback_data='diary_next_day')
+DIARY_BUTTONS: Sequence[Sequence['InlineKeyboardButton']] = [
+    [InlineKeyboardButton(text='Предыдущий день', callback_data='diary_previous_day'),
+     InlineKeyboardButton(text='Следующий день', callback_data='diary_next_day')],
+    [InlineKeyboardButton(text='Обновить', callback_data='update_diary')]
 ]
 
-HOMEWORK_BUTTONS: Sequence['InlineKeyboardButton'] = [
-    InlineKeyboardButton(text='Предыдущий день', callback_data='homework_previous_day'),
-    InlineKeyboardButton(text='Следующий день', callback_data='homework_next_day')
+HOMEWORK_BUTTONS: Sequence[Sequence['InlineKeyboardButton']] = [
+    [InlineKeyboardButton(text='Предыдущий день', callback_data='homework_previous_day'),
+     InlineKeyboardButton(text='Следующий день', callback_data='homework_next_day')],
+    [InlineKeyboardButton(text='Обновить', callback_data='update_homework')]
 ]
 
-SCHEDULE_DAY_BUTTONS: Sequence['InlineKeyboardButton'] = [
-    InlineKeyboardButton(text='Предыдущий день', callback_data='schedule_previous_day'),
-    InlineKeyboardButton(text='Следующий день', callback_data='schedule_next_day')
+SCHEDULE_DAY_BUTTONS: Sequence[Sequence['InlineKeyboardButton']] = [
+    [InlineKeyboardButton(text='Предыдущий день', callback_data='schedule_previous_day'),
+     InlineKeyboardButton(text='Следующий день', callback_data='schedule_next_day')],
+    [InlineKeyboardButton(text='Обновить', callback_data='update_schedule')]
 ]
 
 TOTAL_MARKS_BUTTONS: Sequence['InlineKeyboardButton'] = [

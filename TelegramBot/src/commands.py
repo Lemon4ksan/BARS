@@ -77,7 +77,7 @@ async def get_diary(
     user['diary_week'] = result_dict
     update_db(user, update)
 
-    reply_markup = InlineKeyboardMarkup([templates.DIARY_BUTTONS])
+    reply_markup = InlineKeyboardMarkup([*templates.DIARY_BUTTONS])
 
     try:
         await update.message.reply_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
@@ -115,7 +115,7 @@ async def get_homework(
     user['homework_week'] = result_dict
     update_db(user, update)
 
-    reply_markup = InlineKeyboardMarkup([templates.HOMEWORK_BUTTONS])
+    reply_markup = InlineKeyboardMarkup([*templates.HOMEWORK_BUTTONS])
 
     try:
         await update.message.reply_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
@@ -144,12 +144,8 @@ async def get_schedule_day(
     user['schedule_week'] = result_dict
     update_db(user, update)
 
-    reply_markup = InlineKeyboardMarkup([templates.SCHEDULE_DAY_BUTTONS])
-
-    try:
-        await update.message.reply_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
-    except AttributeError:  # При переходе на другую неделю сообщение None
-        return
+    reply_markup = InlineKeyboardMarkup([*templates.SCHEDULE_DAY_BUTTONS])
+    await update.message.reply_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
 
 
 async def get_summary_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -193,7 +189,6 @@ async def get_total_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             else:
                 text += 'Оценок нет\n'
             total_marks_dict[i] = text
-            text = ''
 
         user['total_marks'] = total_marks_dict
         update_db(user, update)
