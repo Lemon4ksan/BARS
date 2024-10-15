@@ -145,7 +145,11 @@ async def get_schedule_day(
     update_db(user, update)
 
     reply_markup = InlineKeyboardMarkup([*templates.SCHEDULE_DAY_BUTTONS])
-    await update.message.reply_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
+
+    try:
+        await update.message.reply_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
+    except AttributeError:  # При переходе на другую неделю сообщение None
+        return
 
 
 async def get_summary_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
