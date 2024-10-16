@@ -32,7 +32,6 @@ async def process_sessionid(update: Update, user: dict) -> None:
 async def process_attendancedata(update: Update, user: dict) -> None:
     """Обработать ввод данных для посещаемости."""
 
-    # TODO: Исправить шаблон
     async with BClientAsync(user['sessionid']) as client:
         account: 'BARS.AccountInfo' = await client.get_account_info()
         if update.message.text.lower() == 'все':
@@ -56,11 +55,14 @@ async def process_attendancedata(update: Update, user: dict) -> None:
         )
 
     send_text += ATTENDANCE_TEMPLATE.format(
+        attendance_data.total,
+        attendance_data.present,
         attendance_data.absent,
         attendance_data.absent_good,
         attendance_data.absent_bad,
         attendance_data.ill
     )
+    send_text += f'\n\nВы были на {int(round(attendance_data.present / attendance_data.total, 2) * 100)}% уроков'
 
     await update.message.reply_text(send_text)
 

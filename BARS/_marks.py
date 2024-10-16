@@ -170,15 +170,15 @@ class TotalMarks(ClientObject):
 
 @dataclass(slots=True)
 class AttendaceData(ClientObject):
-    """Класс, представляющий отсчёт о посещаемиости.
+    """Класс, представляющий отсчёт о посещаемиости. Данные измеряются в уроках.
 
     Attributes:
         absent (:obj:`int`): Всего отсутствовал.
         absent_bad (:obj:`int`): Отсутствовал без уважительной причины.
         absent_good (:obj:`int`): Отсутствовал по уважительной причине.
         ill (:obj:`int`): Отсутствовал по болезни.
-        present (:obj:`int`): % Присутствия.
-        total (:obj:`int`): Всего %.
+        present (:obj:`int`): Присутствовал.
+        total (:obj:`int`): Всего.
     """
 
     absent: int
