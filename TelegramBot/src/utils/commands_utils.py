@@ -1,56 +1,9 @@
-import json
-from datetime import date
 from collections.abc import Sequence
-from typing import Optional
+from datetime import date
 from datetime import datetime
-from telegram import Update
 
 from BARS import DiaryDay, HomeworkDay, ScheduleDay
-import templates
-
-def get_user_from_db(update: Update) -> dict:
-    """Получить поля пользователя из датабазы."""
-    with open('../db.json', 'r') as f:
-        contents: dict[str, dict] = dict(json.load(f))
-        return contents[str(update.effective_user.id)]
-
-
-def update_db(dictionary: dict, update: Optional[Update] = None) -> None:
-    """Обновить датабазу. Если update не указан, датабаза становиться данным словарём."""
-
-    with open('../db.json', 'r') as f:
-        contents: dict[str, dict] = dict(json.load(f))
-
-    if update:
-        contents[str(update.effective_user.id)] = dictionary
-        with open('../db.json', 'w') as f:
-            json.dump(contents, f)
-    else:
-        with open('../db.json', 'w') as f:
-            json.dump(dictionary, f)
-
-
-def escape_illegal_chars(_object: str) -> str:
-    """Избежать все недопустимые символы из строки/массива для использования в Markdown.
-
-    Не используйте с уже отформатированным текстом."""
-
-    return _object.replace('[', r'\[') \
-        .replace(']', r'\]') \
-        .replace('*', r'\*') \
-        .replace('_', r'\_') \
-        .replace('`', r'\`') \
-        .replace('-', r'\-') \
-        .replace('=', r'\=')
-
-
-def get_school_start_year() -> int:
-    """Получить год начала учёбы."""
-    time = datetime.now()
-    if time.month < 9:
-        return time.year - 1
-    else:
-        return time.year
+from TelegramBot.src import templates
 
 
 def form_diary_send_text(diary_day: 'DiaryDay', f_time: str) -> str:
@@ -126,7 +79,6 @@ def proccess_homework(result_dict: dict, homework_days: Sequence['HomeworkDay'],
             send_text = form_homework_send_text(homework_day, f_time, base_url)
         result_dict[i] = []
         for homework_lesson in homework_day.homeworks:
-
             ttc: str = f'({homework_lesson.homework_time_to_complete} мин)'
 
             materials: list = [
@@ -160,13 +112,13 @@ def form_schedule_send_text(schedule_day: 'ScheduleDay', f_time: str) -> str:
 
 def proccess_schedule(result_dict: dict, schedule_days: Sequence['ScheduleDay'], _date: date) -> str:
     """Обновляет ``result_dict`` данными о расписании на неделю и возвращает текст для отправки в Телеграм."""
-    
+
     for i, schedule_day in enumerate(schedule_days[:-2]):
         schedule_day.remove_html_tags()
 
         # Перевод Г-М-Д на Д.М.Г
         f_time: str = datetime.strptime(schedule_day.lessons[0].date, '%Y-%m-%d').strftime('%d.%m.%Y')
-        
+
         if schedule_day.date == str(_date):
             send_text = form_schedule_send_text(schedule_day, f_time)
 

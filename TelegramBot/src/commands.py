@@ -7,9 +7,9 @@ from telegram.ext import ContextTypes
 
 import BARS
 import templates
-import utils
 from BARS import BClientAsync
-from utils import get_user_from_db, update_db, escape_illegal_chars
+from utils.general import get_user_from_db, update_db, escape_illegal_chars
+from utils.commands_utils import proccess_diary, proccess_homework, proccess_schedule
 
 
 # TODO: Добавить опцию для учёта субботы
@@ -73,7 +73,7 @@ async def get_diary(
     async with BClientAsync(user['sessionid']) as client:
         diary_days: Sequence['BARS.DiaryDay'] = await client.get_diary(date)
 
-    send_text: str = utils.proccess_diary(result_dict, diary_days, date)
+    send_text: str = proccess_diary(result_dict, diary_days, date)
     user['diary_week'] = result_dict
     update_db(user, update)
 
@@ -111,7 +111,7 @@ async def get_homework(
     async with BClientAsync(user['sessionid']) as client:
         homework: Sequence['BARS.HomeworkDay'] = await client.get_homework(date)
 
-    send_text: str = utils.proccess_homework(result_dict, homework, client.base_url, date)
+    send_text: str = proccess_homework(result_dict, homework, client.base_url, date)
     user['homework_week'] = result_dict
     update_db(user, update)
 
@@ -140,7 +140,7 @@ async def get_schedule_day(
     async with BClientAsync(user['sessionid']) as client:
         schedule_week: Sequence['BARS.ScheduleDay'] = await client.get_week_schedule(date)
 
-    send_text = utils.proccess_schedule(result_dict, schedule_week, date)
+    send_text: str = proccess_schedule(result_dict, schedule_week, date)
     user['schedule_week'] = result_dict
     update_db(user, update)
 
@@ -160,7 +160,6 @@ async def get_summary_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         summary_marks: 'BARS.SummaryMarks' = await client.get_summary_marks(datetime.now().date())
 
     send_text: str = ''
-
     for discipline in summary_marks.disciplines:
         marks = [str(marks.mark) for marks in discipline.marks]
         send_text += f"\n*{discipline.discipline}*: {discipline.average_mark}\n{' '.join(marks)}"
@@ -176,32 +175,30 @@ async def get_total_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     total_marks_dict: dict = {}
 
     async with BClientAsync(user['sessionid']) as client:
-
         total_marks: 'BARS.TotalMarks' = await client.get_total_marks()
-        text: str = ""
 
-        period: 'BARS.Subperiod'  # Четверть
-        discipline_mark: 'BARS.TotalMarksDiscipline'  # Сборник оценок по предмету
-        i: int  # Индекс четверти
-        # Конвертация запутанная, т.к. API был создан только для работы с таблицей на самом сайте.
+    period: 'BARS.Subperiod'  # Четверть
+    discipline_mark: 'BARS.TotalMarksDiscipline'  # Сборник оценок по предмету
+    i: int  # Индекс четверти
+    # Конвертация запутанная, т.к. API был создан только для работы с таблицей на самом сайте.
 
-        for period, discipline_mark, i in zip(total_marks.subperiods, total_marks.disciplines, range(4)):
-            text += '\n' + period.name + '\n'
+    for period, discipline_mark, i in zip(total_marks.subperiods, total_marks.disciplines, range(4)):
+        text: str = '\n' + period.name + '\n'
 
-            if discipline_mark.period_marks:
-                text += f"{discipline_mark.discipline}: {discipline_mark.period_marks[i]}\n"
-            else:
-                text += 'Оценок нет\n'
-            total_marks_dict[i] = text
+        if discipline_mark.period_marks:
+            text += f"{discipline_mark.discipline}: {discipline_mark.period_marks[i]}\n"
+        else:
+            text += 'Оценок нет\n'
+        total_marks_dict[i] = text
 
-        user['total_marks'] = total_marks_dict
-        update_db(user, update)
+    user['total_marks'] = total_marks_dict
+    update_db(user, update)
 
-        reply_markup = InlineKeyboardMarkup([
-            [templates.TOTAL_MARKS_BUTTONS[0], templates.TOTAL_MARKS_BUTTONS[1]],
-            [templates.TOTAL_MARKS_BUTTONS[2], templates.TOTAL_MARKS_BUTTONS[3]]
-        ])
-        await update.message.reply_text('Выберите четверть', reply_markup=reply_markup)
+    reply_markup = InlineKeyboardMarkup([
+        [templates.TOTAL_MARKS_BUTTONS[0], templates.TOTAL_MARKS_BUTTONS[1]],
+        [templates.TOTAL_MARKS_BUTTONS[2], templates.TOTAL_MARKS_BUTTONS[3]]
+    ])
+    await update.message.reply_text('Выберите четверть', reply_markup=reply_markup)
 
 
 async def get_attendance_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -229,34 +226,36 @@ async def get_school_info(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     async with BClientAsync(user['sessionid']) as client:
         school_info: 'BARS.SchoolInfo' = await client.get_school_info()
 
-        send_text: str = f"*{escape_illegal_chars(school_info.name)}*\n\n"
-        send_text += templates.SCHOOL_INFO_TEMPLATE.format(
-            escape_illegal_chars(school_info.address),
-            escape_illegal_chars(school_info.phone),
-            escape_illegal_chars(school_info.site_url),
-            str(school_info.count_employees),
-            str(school_info.count_pupils),
-            escape_illegal_chars(school_info.email)
-        )
-        await update.message.reply_text(send_text, parse_mode='Markdown')
+    send_text: str = f"*{escape_illegal_chars(school_info.name)}*\n\n"
+    send_text += templates.SCHOOL_INFO_TEMPLATE.format(
+        escape_illegal_chars(school_info.address),
+        escape_illegal_chars(school_info.phone),
+        escape_illegal_chars(school_info.site_url),
+        str(school_info.count_employees),
+        str(school_info.count_pupils),
+        escape_illegal_chars(school_info.email)
+    )
+    await update.message.reply_text(send_text, parse_mode='Markdown')
 
 
 async def get_class_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команада /get_class_info. Информация о классе."""
 
     user: dict = get_user_from_db(update)
+
     async with BClientAsync(user['sessionid']) as client:
         class_info: 'BARS.ClassInfo' = await client.get_class_info()
-        pupils: Sequence[str] = [pupil.fullname for pupil in class_info.pupils]
-        send_text: str = templates.CLASS_INFO_TEMPLATE.format(
-            class_info.study_level,
-            class_info.letter,
-            class_info.form_master,
-            class_info.specialization,
-            len(pupils),
-            "\n".join(pupils)
-        )
-        await update.message.reply_text(send_text, parse_mode='MarkdownV2')
+
+    pupils: Sequence[str] = [pupil.fullname for pupil in class_info.pupils]
+    send_text: str = templates.CLASS_INFO_TEMPLATE.format(
+        class_info.study_level,
+        class_info.letter,
+        class_info.form_master,
+        class_info.specialization,
+        len(pupils),
+        "\n".join(pupils)
+    )
+    await update.message.reply_text(send_text, parse_mode='Markdown')
 
 
 async def get_birthdays(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
