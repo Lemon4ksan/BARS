@@ -1,7 +1,6 @@
 import json
 from collections.abc import Sequence
 from datetime import datetime, timedelta
-from typing import Optional
 
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
@@ -51,7 +50,7 @@ async def get_diary(
         update: Update,
         context: ContextTypes.DEFAULT_TYPE,
         *,
-        date: Optional[datetime] = None,
+        date=None,
         delta=timedelta(0)
 ) -> None:
     """Комманда /get_diary. Выводит неделю из дневника.
@@ -93,7 +92,7 @@ async def get_homework(
         update: Update,
         context: ContextTypes.DEFAULT_TYPE,
         *,
-        date: Optional[datetime] = None,
+        date=None,
         delta=timedelta(0)
 ) -> None:
     """Комманда /get_homework. Выводит домашнее задание.
@@ -133,7 +132,7 @@ async def get_homework(
 async def get_schedule_day(
         update: Update,
         context: ContextTypes.DEFAULT_TYPE,
-        date: Optional[datetime] = None,
+        date=None,
         delta=timedelta(0)
 ) -> None:
     """Команда /get_schedule_day. Расписание на день/неделю. Записывает в датабазу. Использует Inline клавиатуру.
