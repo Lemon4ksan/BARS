@@ -18,11 +18,7 @@ from utils.commands_utils import proccess_diary, proccess_homework, proccess_sch
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Инициализация пользователя в датабазе. Вывод доступных команд."""
 
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=templates.WELCOME_TEXT,
-        parse_mode='Markdown'
-    )
+    await update.effective_message.reply_text(templates.WELCOME_TEXT, parse_mode='Markdown')
     try:
         with open('../db.json', 'r') as f:
             contents = dict(json.load(f))
@@ -40,7 +36,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def set_sessionid(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команда /set_sessionid. Устанавливает sessionid. Записывает в датабазу."""
 
-    await update.message.reply_text('Введите sessionid')
+    reply_markup = InlineKeyboardMarkup(templates.SID_BUTTON)
+    await update.message.reply_text('Введите sessionid', reply_markup=reply_markup)
     user: dict = get_user_from_db(update)
     user['current_operation'] = 'sessionid'
     update_db(user, update)

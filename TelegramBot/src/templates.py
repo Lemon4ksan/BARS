@@ -35,6 +35,19 @@ WELCOME_TEXT: str = r"""Этот бот позволит вам пользова
 /get\_birthdays - Текущие Дни Рождений
 /get\_events - Текущие праздники"""
 
+WHAT_IS_SID: str = """sessionid - это идентификатор вашей сессии. Благодаря нему можно костыльно получить данные вашего аккаунта вне сайта.
+
+Чтобы получить данное значение:
+1. Задите на сайт с ПК.
+2. Откройте панель разработчика (Ctrl+Shift+I).
+3. Перейдите во вкладку Приложение (Application).
+4. Откройте Хранилище > Файлы cookie.
+5. Скопируйте значение ключа sessionid.
+
+Чтобы сессия не заканчивалась, измените её дату истекания (Expires/Max-Age) на [ГОД]-04-18T13:10:00.000Z заменив [ГОД] на следующий."""
+
+SID_BUTTON: Sequence[Sequence['InlineKeyboardButton']] = [[InlineKeyboardButton(text='Что такое sessionid?', callback_data='about_sid')]]
+
 DIARY_LESSON_TEMPLATE: str = """\n*{discipline}*{theme}{mark_info}{comment}{remarks}{attendance}\n"""
 
 HOMEWORK_LESSON_TEMPLATE: str = """\n*{discipline}*\n{homework} {time_to_complete}{materials}\n"""

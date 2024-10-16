@@ -23,25 +23,13 @@ async def handle_exception(update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 user[key] = None
         logging.error("".join(traceback.format_exception(None, context.error, context.error.__traceback__)))
         update_db(user, update)
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text='❌ Внутренняя ошибка. Попробуйте ещё раз'
-        )
+        await update.effective_message.reply_text('❌ Внутренняя ошибка. Попробуйте ещё раз')
     elif isinstance(context.error, exceptions.Unauthorized):
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text='❌ Недействительный sessionid. Обновите его с помощью /set_sessionid'
-        )
+        await update.effective_message.reply_text('❌ Недействительный sessionid. Обновите его с помощью /set_sessionid')
     elif isinstance(context.error, exceptions.InternalError):
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f'❌ В данный момент сайт недоступен. Повторите попытку позже.'
-        )
+        await update.effective_message.reply_text(f'❌ В данный момент сайт недоступен. Повторите попытку позже.')
     else:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f'❌ Произошла неизвестная ошибка:\n {str(context.error)}'
-        )
+        await update.effective_message.reply_text(f'❌ Произошла неизвестная ошибка:\n {str(context.error)}')
         logging.error("".join(traceback.format_exception(None, context.error, context.error.__traceback__)))
 
 
@@ -66,6 +54,8 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     user: dict = get_user_from_db(update)
     match update.callback_query.data:
+        case 'about_sid':
+            await update.effective_message.edit_text(templates.WHAT_IS_SID)
         case 'diary_next_day':
             await process_diary(update, context, user, step=1)
         case 'diary_previous_day':
