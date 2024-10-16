@@ -1,6 +1,7 @@
 import json
 from collections.abc import Sequence
 from datetime import datetime, timedelta
+from typing import Optional
 
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
@@ -50,19 +51,22 @@ async def get_diary(
         update: Update,
         context: ContextTypes.DEFAULT_TYPE,
         *,
-        date=datetime.now().date(),
+        date: Optional[datetime] = None,
         delta=timedelta(0)
 ) -> None:
     """Комманда /get_diary. Выводит неделю из дневника.
 
-    ``date`` указывется для указания точки смещения.
-    ``delta`` указывается для смещения времени при достижении конца.
+    ``date`` указывется для указания точки смещения. Если значение пустое, используется сегодняшний день.
+    ``delta`` указывается для смещения времени при достижении края недели.
 
     Добавляет в поле пользователя ``{'diary_week': {'current_weekday': 0-4, i: [{date: str, discipline: str, theme: str, mark_info: str, comment: str remarks: str},...],... }}``
     
     где ``i`` - индекс дня (0-4, строка). Суббота исключается.
 
     Использует Inline клавиатуру."""
+
+    if date is None:
+        date = datetime.now().date()
 
     user: dict = get_user_from_db(update)
     date += delta
@@ -89,18 +93,21 @@ async def get_homework(
         update: Update,
         context: ContextTypes.DEFAULT_TYPE,
         *,
-        date=datetime.now().date(),
+        date: Optional[datetime] = None,
         delta=timedelta(0)
 ) -> None:
     """Комманда /get_homework. Выводит домашнее задание.
 
-    ``date`` указывется для указания точки смещения.
-    ``delta`` указывается для смещения времени при достижении конца.
+    ``date`` указывется для указания точки смещения. Если значение пустое, используется сегодняшний день.
+    ``delta`` указывается для смещения времени при достижении края недели.
 
      Записывает в датабазу: ``{'homework_week': {'current_weekday': 0-4, i: [Последовательность д/з]}}``,
      где ``i`` - индекс дня (0-4, строка). Суббота исключается.
 
      Использует Inline клавиатуру."""
+
+    if date is None:
+        date = datetime.now().date()
 
     user: dict = get_user_from_db(update)
     date += delta
@@ -126,10 +133,17 @@ async def get_homework(
 async def get_schedule_day(
         update: Update,
         context: ContextTypes.DEFAULT_TYPE,
-        date=datetime.now().date(),
+        date: Optional[datetime] = None,
         delta=timedelta(0)
 ) -> None:
-    """Команда /get_schedule_day. Расписание на день/неделю. Записывает в датабазу. Использует Inline клавиатуру."""
+    """Команда /get_schedule_day. Расписание на день/неделю. Записывает в датабазу. Использует Inline клавиатуру.
+
+    ``date`` указывется для указания точки смещения. Если значение пустое, используется сегодняшний день.
+    ``delta`` указывается для смещения времени при достижении края недели.
+    """
+
+    if date is None:
+        date = datetime.now().date()
 
     user: dict = get_user_from_db(update)
     date += delta
