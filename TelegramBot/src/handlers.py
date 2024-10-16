@@ -1,19 +1,15 @@
 import logging
 import traceback
-from datetime import datetime, timedelta
 
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 import templates
 from BARS import exceptions
-from commands import get_diary, get_homework, get_schedule_day
 from utils.general import get_user_from_db, update_db
 from utils.handlers_utils import (
     process_sessionid, process_progressdata, process_attendancedata,
-    process_diary, update_diary,
-    process_homework, update_homework,
-    process_schedule, update_schedule
+    process_diary, process_homework, process_schedule
 )
 
 
@@ -74,20 +70,14 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             await process_diary(update, context, user, step=1)
         case 'diary_previous_day':
             await process_diary(update, context, user, step=-1)
-        case 'update_diary':
-            await update_diary(update, context, user)
         case 'homework_next_day':
             await process_homework(update, context, user, step=1)
         case 'homework_previous_day':
             await process_homework(update, context, user, step=-1)
-        case 'update_homework':
-            await update_homework(update, context, user)
         case 'schedule_next_day':
             await process_schedule(update, context, user, step=1)
         case 'schedule_previous_day':
             await process_schedule(update, context, user, step=-1)
-        case 'update_schedule':
-            await update_schedule(update, context, user)
         case 'total_marks_subperiod1':
             reply_markup = InlineKeyboardMarkup([
                 [templates.TOTAL_MARKS_BUTTONS[1], templates.TOTAL_MARKS_BUTTONS[2]],

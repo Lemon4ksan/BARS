@@ -131,24 +131,6 @@ async def process_diary(
     await update.effective_message.edit_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
 
 
-async def update_diary(update: Update, context: ContextTypes.DEFAULT_TYPE, user: dict) -> None:
-    data: dict = user['diary_week']
-    current_index = data['current_weekday']
-
-    p_date = datetime.strptime(data[str(current_index)][0]['date'], '%d.%m.%Y')
-    await get_diary(update, context, date=p_date.date())
-    user: dict = get_user_from_db(update)
-    data: dict = user['diary_week']
-
-    send_text: str = f'Обновлено в {datetime.now().strftime('%H:%M:%S')}\n\n'
-    send_text += f"*{data[str(current_index)][0]['date']}*"
-    for diary_lesson in data[str(current_index)]:
-        send_text += DIARY_LESSON_TEMPLATE.format(**diary_lesson)
-
-    reply_markup = InlineKeyboardMarkup([*DIARY_BUTTONS])
-    await update.effective_message.edit_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
-
-
 async def process_homework(
         update: Update,
         context: ContextTypes.DEFAULT_TYPE,
@@ -184,24 +166,6 @@ async def process_homework(
     await update.effective_message.edit_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
 
 
-async def update_homework(update: Update, context: ContextTypes.DEFAULT_TYPE, user: dict):
-    data: dict = user['homework_week']
-    current_index = data['current_weekday']
-
-    p_date = datetime.strptime(data[str(current_index)][0]['date'], '%d.%m.%Y')
-    await get_homework(update, context, date=p_date.date())
-    user: dict = get_user_from_db(update)
-    data: dict = user['homework_week']
-
-    send_text: str = f'Обновлено в {datetime.now().strftime('%H:%M:%S')}\n\n'
-    send_text += f"*{data[str(current_index)][0]['date']}*"
-    for homework_lesson in data[str(current_index)]:
-        send_text += HOMEWORK_LESSON_TEMPLATE.format(**homework_lesson)
-
-    reply_markup = InlineKeyboardMarkup([*HOMEWORK_BUTTONS])
-    await update.effective_message.edit_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
-
-
 async def process_schedule(
         update: Update,
         context: ContextTypes.DEFAULT_TYPE,
@@ -234,21 +198,4 @@ async def process_schedule(
     send_text: str = f"*{data[str(next_index)][0]['date']}*"
     for schedule in data[str(next_index)]:
         send_text += SCHEDULE_DAY_TEMPLATE.format(**schedule)
-    await update.effective_message.edit_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
-
-async def update_schedule(update: Update, context: ContextTypes.DEFAULT_TYPE, user: dict):
-    data: dict = user['schedule_week']
-    current_index = data['current_weekday']
-
-    p_date = datetime.strptime(data[str(current_index)][0]['date'], '%d.%m.%Y')
-    await get_schedule_day(update, context, date=p_date.date())
-    user: dict = get_user_from_db(update)
-    data: dict = user['schedule_week']
-
-    send_text: str = f'Обновлено в {datetime.now().strftime('%H:%M:%S')}\n\n'
-    send_text += f"*{data[str(current_index)][0]['date']}*"
-    for schedule in data[str(current_index)]:
-        send_text += SCHEDULE_DAY_TEMPLATE.format(**schedule)
-
-    reply_markup = InlineKeyboardMarkup([*SCHEDULE_DAY_BUTTONS])
     await update.effective_message.edit_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
