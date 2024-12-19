@@ -9,7 +9,7 @@ def get_user_from_db(update: Update) -> dict:
     """Получить поля пользователя из датабазы."""
     if update.effective_user is None:
         raise TelegramBotError("Не удалось получить запись из датабазы. Неизвестный пользователь.")
-    with open('..\\db.json', 'r') as f:
+    with open('.\\TelegramBot\\db.json', 'r') as f:
         contents: dict[str, dict] = dict(json.load(f))
         return contents[str(update.effective_user.id)]
 
@@ -17,7 +17,7 @@ def get_user_from_db(update: Update) -> dict:
 def update_db(dictionary: dict, update: Optional[Update] = None) -> None:
     """Обновить датабазу. Если update не указан, датабаза становиться данным словарём."""
 
-    with open('..\\db.json', 'r') as f:
+    with open('.\\TelegramBot\\db.json', 'r') as f:
         contents: dict[str, dict] = dict(json.load(f))
 
     if update:
@@ -25,10 +25,10 @@ def update_db(dictionary: dict, update: Optional[Update] = None) -> None:
             raise TelegramBotError()
 
         contents[str(update.effective_user.id)] = dictionary
-        with open('..\\db.json', 'w') as f:
+        with open('.\\TelegramBot\\db.json', 'w') as f:
             json.dump(contents, f)
     else:
-        with open('..\\db.json', 'w') as f:
+        with open('.\\TelegramBot\\db.json', 'w') as f:
             json.dump(dictionary, f)
 
 

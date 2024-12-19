@@ -26,10 +26,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     await update.effective_message.reply_text(templates.WELCOME_TEXT, parse_mode='Markdown')
     try:
-        with open('..\\db.json', 'r') as f:
+        with open('.\\TelegramBot\\db.json', 'r') as f:
             contents: dict = dict(json.load(f))
     except FileNotFoundError:
-        with open('..\\db.json', 'w') as f:
+        with open('.\\TelegramBot\\db.json', 'w') as f:
             json.dump({}, f)
         contents = {}
 
