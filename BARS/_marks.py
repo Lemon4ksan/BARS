@@ -8,9 +8,9 @@ class Mark(ClientObject):
     """Класс, представляющий данные оценки.
 
     Attributes:
-        date (:obj:`str`): Дата формата Год-Месяц-День.
-        description (:obj:`str`): Описание оценки.
-        mark (:obj:`int`): Оценка.
+        date (`str`): Дата формата Год-Месяц-День.
+        description (`str`): Описание оценки.
+        mark (`int`): Оценка.
     """
 
     date: str
@@ -19,7 +19,7 @@ class Mark(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'Mark':
 
@@ -34,18 +34,18 @@ class SummaryMarksDiscipline(ClientObject):
     """Класс, представляющий данные урока из сводной.
 
     Attributes:
-        average_mark (:obj:`float`): Средняя оценка.
-        discipline (:obj:`str`): Название урока.
-        marks (Sequence[:class:`BARS.Mark`]): Оценки урока.
+        average_mark (`float`): Средняя оценка.
+        discipline (`str`): Название урока.
+        marks (Sequence[`BARS.Mark`]): Оценки урока.
     """
 
     average_mark: float
     discipline: str
-    marks: Sequence['Mark']
+    marks: Sequence[Mark]
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'SummaryMarksDiscipline':
 
@@ -63,8 +63,8 @@ class Subperiod(ClientObject):
     """Класс, представляющий информацию о четверти.
 
     Attributes:
-        code (:obj:`str`): Кодовое название четверти.
-        name (:obj:`str`): Название четверти.
+        code (`str`): Кодовое название четверти.
+        name (`str`): Название четверти.
     """
 
     code: str
@@ -72,7 +72,7 @@ class Subperiod(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'Subperiod':
 
@@ -85,18 +85,18 @@ class SummaryMarks(ClientObject):
     """Класс, представляющий данные о сводных оценках.
 
     Attributes:
-        dates (Sequence[:obj:`str`]): Даты из сводной.
-        disciplines (Sequence[:class:`BARS.SummaryMarksDiscipline`]): Последовательность уроков из сводной.
-        subperiod (:class:`BARS.Subperiod`): Информация о четверти.
+        dates (Sequence[`str`]): Даты из сводной.
+        disciplines (Sequence[`BARS.SummaryMarksDiscipline`]): Последовательность уроков из сводной.
+        subperiod (`BARS.Subperiod`): Информация о четверти.
     """
 
     dates: Sequence[str]
-    disciplines: Sequence['SummaryMarksDiscipline']
+    disciplines: Sequence[SummaryMarksDiscipline]
     subperiod: Subperiod
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'SummaryMarks':
 
@@ -117,21 +117,18 @@ class TotalMarksDiscipline(ClientObject):
     """Класс, представляющий данные урока из сводной.
 
     Attributes:
-        discipline (:obj:`str`): Название урока.
-        period_marks (Sequence[:class:`BARS.Mark`]): Последовательность оценок в четвертях.
+        discipline (`str`): Название урока.
+        period_marks (Sequence[`dict[str, str]`]): Последовательность словарей оценок в четвертях. Ключ 'mark' - оценка, ключ 'subperiod_code' - код четверти.
     """
 
     discipline: str
-    period_marks: Sequence[int]
+    period_marks: Sequence[dict[str, str]]
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'TotalMarksDiscipline':
-
-        for i, mark in enumerate(data['period_marks']):
-            data['period_marks'][i] = int(data['period_marks'][i])
 
         data = super(TotalMarksDiscipline, cls).de_json(data)
 
@@ -142,16 +139,16 @@ class TotalMarks(ClientObject):
     """Класс, представляющий информацию об итоговых оценках.
 
     Attributes:
-        disciplines (Sequence[:class:`TotalMarksDiscipline`]): Последовательность соответствующих предметов
-        subperiods (Sequence[:class:`Subperiod`]): Последовательность четвертей
+        disciplines (Sequence[`TotalMarksDiscipline`]): Последовательность соответствующих предметов
+        subperiods (Sequence[`Subperiod`]): Последовательность четвертей
     """
 
-    disciplines: Sequence['TotalMarksDiscipline']
-    subperiods: Sequence['Subperiod']
+    disciplines: Sequence[TotalMarksDiscipline]
+    subperiods: Sequence[Subperiod]
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'TotalMarks':
 
@@ -173,12 +170,12 @@ class AttendaceData(ClientObject):
     """Класс, представляющий отсчёт о посещаемиости. Данные измеряются в уроках.
 
     Attributes:
-        absent (:obj:`int`): Всего отсутствовал.
-        absent_bad (:obj:`int`): Отсутствовал без уважительной причины.
-        absent_good (:obj:`int`): Отсутствовал по уважительной причине.
-        ill (:obj:`int`): Отсутствовал по болезни.
-        present (:obj:`int`): Присутствовал.
-        total (:obj:`int`): Всего.
+        absent (`int`): Всего отсутствовал.
+        absent_bad (`int`): Отсутствовал без уважительной причины.
+        absent_good (`int`): Отсутствовал по уважительной причине.
+        ill (`int`): Отсутствовал по болезни.
+        present (`int`): Присутствовал.
+        total (`int`): Всего.
     """
 
     absent: int
@@ -190,7 +187,7 @@ class AttendaceData(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'AttendaceData':
 
@@ -203,10 +200,10 @@ class SeriesItem(ClientObject):
     """Класс, представляющий график оценок.
 
     Attributes:
-        color (:obj:`str`): HEX код цвета.
-        data (Sequence[:obj:`int`]): Оценки на графике. Среднее арифметическое.
-        name (:obj:`str`): Название пункта.
-        point_width (:obj:`str`): Ширина точки в пикселях.
+        color (`str`): HEX код цвета.
+        data (Sequence[`int`]): Оценки на графике. Среднее арифметическое.
+        name (`str`): Название пункта.
+        point_width (`str`): Ширина точки в пикселях.
     """
 
     color: str
@@ -216,7 +213,7 @@ class SeriesItem(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'SeriesItem':
 
@@ -232,20 +229,20 @@ class ProgressData(ClientObject):
     """Класс, представляющий данные об успеваемости.
 
     Attributes:
-        categories (Sequence[:obj:`int`]): Неизвестно.
-        dates (Sequence[:obj:`str`]): Даты с оценками.
-        series (Sequence[:class:`BARS.SeriesItem`]): Данные графика.
-        subject (:obj:`str`): Название предмета.
+        categories (Sequence[`int`]): Неизвестно.
+        dates (Sequence[`str`]): Даты с оценками.
+        series (Sequence[`BARS.SeriesItem`]): Данные графика.
+        subject (`str`): Название предмета.
     """
 
     categories: Sequence[int]
     dates: Sequence[str]
-    series: Sequence['SeriesItem']
+    series: Sequence[SeriesItem]
     subject: str
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'ProgressData':
 

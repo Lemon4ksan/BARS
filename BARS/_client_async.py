@@ -3,7 +3,7 @@ import httpx
 import logging
 import functools
 from collections.abc import Sequence, Callable
-from typing import Optional, LiteralString, TypeVar, Any
+from typing import Optional, LiteralString, Any
 
 from .exceptions import Unauthorized, BClientException, InternalError
 from ._base import ClientObject
@@ -17,9 +17,7 @@ from ._misc import Event, Birthday
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-F = TypeVar('F', bound=Callable[..., Any])
-
-def log(method: F) -> F:
+def log(method: Callable[..., Any]) -> Any:
     logger = logging.getLogger(method.__module__)
 
     @functools.wraps(method)
@@ -40,18 +38,18 @@ class BClientAsync(ClientObject):
     """Класс, представляющий клиент для оращение к БАРСу.
 
     Args:
-        sessionid (:obj:`str`): Идентификатор вашей сессии. Данный способ обращения является костылём, но способа лучше не было найдено.
+        sessionid (`str`): Идентификатор вашей сессии. Данный способ обращения является костылём, но способа лучше не было найдено.
             Можно найти в файлах куки с помощью DevTools.
-        proxy (:obj:`str`, optional): Прокси для запросов. Для работы необходимо использовать контекстный менеджер with.
-        base_url (:obj:`str`, optional): Ссылка на домен сайта.
-        headers (:obj:`dict`, optional): Словарь, содержащий сведения об устройстве, с которого выполняются запросы.
+        proxy (`str`, optional): Прокси для запросов. Для работы необходимо использовать контекстный менеджер with.
+        base_url (`str`, optional): Ссылка на домен сайта.
+        headers (`dict`, optional): Словарь, содержащий сведения об устройстве, с которого выполняются запросы.
             Используется при каждом запросе на сайт.
 
     Attributes:
-        sessionid (:obj:`str`): Идентификатор вашей сессии.
-        proxy (:obj:`str`, optional): Прокси для запросов.
-        base_url (:obj:`str`, optional): Ссылка на домен сайта.
-        headers (:obj:`dict`, optional): Словарь, содержащий сведения об устройстве, с которого выполняются запросы.
+        sessionid (`str`): Идентификатор вашей сессии.
+        proxy (`str`, optional): Прокси для запросов.
+        base_url (`str`, optional): Ссылка на домен сайта.
+        headers (`dict`, optional): Словарь, содержащий сведения об устройстве, с которого выполняются запросы.
             Используется при каждом запросе на сайт.
     """
 
@@ -76,8 +74,6 @@ class BClientAsync(ClientObject):
                 'manufacturer': 'Lemon4ksan',
             }
         self.headers = headers
-
-        self._httpx_client = None
         self.proxy = proxy
 
     async def __aenter__(self):
@@ -88,14 +84,14 @@ class BClientAsync(ClientObject):
         await self._httpx_client.aclose()
 
     @log
-    async def get_diary(self, date: str) -> Sequence['DiaryDay']:
+    async def get_diary(self, date: str) -> Sequence[DiaryDay]:
         """Получить данные из вкладки 'Дневник'.
 
         Args:
-            date (:obj:`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
+            date (`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
 
         Returns:
-            Sequence[:obj:`BARS.DiaryDay`]: Неделя из дневника.
+            Sequence[`BARS.DiaryDay`]: Неделя из дневника.
         """
 
         url = self.base_url + 'api/ScheduleService/GetDiary'
@@ -123,14 +119,14 @@ class BClientAsync(ClientObject):
         return return_data
 
     @log
-    async def get_week_schedule(self, date: str) -> Sequence['ScheduleDay']:
+    async def get_week_schedule(self, date: str) -> Sequence[ScheduleDay]:
         """Получить данные из вкладки 'Расписание > Неделя'.
 
         Args:
-            date (:obj:`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
+            date (`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
 
         Returns:
-            Sequence[:obj:`BARS.DiaryDay`]: Расписание на неделю.
+            Sequence[`BARS.DiaryDay`]: Расписание на неделю.
         """
 
         url = self.base_url + 'api/ScheduleService/GetWeekSchedule'
@@ -158,14 +154,14 @@ class BClientAsync(ClientObject):
         return return_data
 
     @log
-    async def get_month_schedule(self, date: str) -> Sequence['ScheduleMonth']:
+    async def get_month_schedule(self, date: str) -> Sequence[ScheduleMonth]:
         """Получить данные из вкладки 'Расписание > Месяц'.
 
         Args:
-            date (:obj:`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
+            date (`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
 
         Returns:
-            Sequence[:obj:`BARS.ScheduleMonth`]: Расписание на месяц.
+            Sequence[`BARS.ScheduleMonth`]: Расписание на месяц.
         """
 
         url = self.base_url + 'api/ScheduleService/GetMonthSchedule'
@@ -197,13 +193,13 @@ class BClientAsync(ClientObject):
         """Поулчить абсолютную ссылку на загрузку таблицы расписания.
 
         Args:
-            date (:obj:`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
-            interval (:obj:`LiteralString`): Интервал расписания.
+            date (`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
+            interval (`LiteralString`): Интервал расписания.
                 'week' - Неделя (по умолчанию).
                 'month' - Месяц.
 
         Returns:
-            :obj:`str`: Абсолютная ссылка на загрузку таблицы расписания.
+            `str`: Абсолютная ссылка на загрузку таблицы расписания.
         """
 
         url = self.base_url + 'api/ScheduleService/ScheduleReport'
@@ -223,19 +219,21 @@ class BClientAsync(ClientObject):
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
                 case _:
-                    raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
-
-        return 'https://xn--80atdl2c.xn--33-6kcadhwnl3cfdx.xn--p1ai' + result.replace('"', "")
+                    raise BClientException(f"Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}")
+        elif isinstance(result, str):
+            return 'https://xn--80atdl2c.xn--33-6kcadhwnl3cfdx.xn--p1ai' + result.replace('"', "")
+        else:
+            raise ValueError(f"Был получен непредусмотренный тип '{type(result).__name__}' вместо ожидаемого 'dict' или 'str'.")
 
     @log
-    async def get_summary_marks(self, date: str) -> 'SummaryMarks':
+    async def get_summary_marks(self, date: str) -> SummaryMarks:
         """Поулчить данные из вкладки 'Оценки > Сводная'.
 
         Args:
-            date (:obj:`str`): Дата формата Год-Месяц-День, четверть которой будет возвращена.
+            date (`str`): Дата формата Год-Месяц-День, четверть которой будет возвращена.
 
         Returns:
-            :class:`BARS.SummaryMarks`: Сводные оценки.
+            `BARS.SummaryMarks`: Сводные оценки.
         """
 
         url = self.base_url + 'api/MarkService/GetSummaryMarks'
@@ -260,11 +258,11 @@ class BClientAsync(ClientObject):
         return SummaryMarks.de_json(result)
 
     @log
-    async def get_total_marks(self) -> 'TotalMarks':
+    async def get_total_marks(self) -> TotalMarks:
         """Поулчить данные из вкладки 'Оценки > Итоговые'. Данные ограничены этим годом.
 
         Returns:
-            :class:`BARS.SummaryMarks`: Итоговые оценки.
+            `BARS.SummaryMarks`: Итоговые оценки.
         """
 
         url = self.base_url + 'api/MarkService/GetTotalMarks'
@@ -288,11 +286,11 @@ class BClientAsync(ClientObject):
         return TotalMarks.de_json(result)
 
     @log
-    async def get_account_info(self) -> 'AccountInfo':
+    async def get_account_info(self) -> AccountInfo:
         """Получить скрытую информацию об аккаунте. Реализуется через GetVisualizationData.
 
         Returns:
-            :class:`BARS.AccountInfo`: Информация об аккаунте.
+            `BARS.AccountInfo`: Информация об аккаунте.
         """
 
         url = self.base_url + 'api/MarkService/GetVisualizationData'
@@ -316,11 +314,11 @@ class BClientAsync(ClientObject):
         return AccountInfo.de_json(result)
 
     @log
-    async def get_pupil_info(self) -> 'PupilInfo':
+    async def get_pupil_info(self) -> PupilInfo:
         """Получить данные об ученике.
 
         Returns:
-            :class:`BARS.PupilInfo`: Информация об ученике.
+            `BARS.PupilInfo`: Информация об ученике.
         """
 
         url = self.base_url + 'api/ProfileService/GetPersonData'
@@ -344,19 +342,19 @@ class BClientAsync(ClientObject):
         return PupilInfo.de_json(result)
 
     @log
-    async def get_attendace_data(self, pupilid: int, date_begin: str, date_end: str, subjectid: int = 0) -> 'AttendaceData':
+    async def get_attendace_data(self, pupilid: int, date_begin: str, date_end: str, subjectid: int = 0) -> AttendaceData:
         """Получить данные о посещаемости.
 
         Для получения данных аргументов См. get_account_info.
 
         Args:
-            pupilid (:obj:`int`): Уникальный идентификатор ученика.
-            date_begin (:obj:`int`): Год-Месяц-День, начала отсчёта.
-            date_end (:obj:`int`): Год-Месяц-День, конца отсчёта.
-            subjectid (:obj:`int`): Уникальный идентификатор предмета. 0 - общая статистика.
+            pupilid (`int`): Уникальный идентификатор ученика.
+            date_begin (`int`): Год-Месяц-День, начала отсчёта.
+            date_end (`int`): Год-Месяц-День, конца отсчёта.
+            subjectid (`int`): Уникальный идентификатор предмета. 0 - общая статистика.
 
         Returns:
-            :class:`BARS.AttendanceData`: Данные о посещаемости.
+            `BARS.AttendanceData`: Данные о посещаемости.
         """
 
         url = self.base_url + 'actions/web_edu.core.pupil.chart.ChartPack/attendancedata'
@@ -386,19 +384,19 @@ class BClientAsync(ClientObject):
         return AttendaceData.de_json(result)
 
     @log
-    async def get_progress_data(self, pupilid: int, date_begin: str, date_end: str, subjectid: int = 0) -> 'ProgressData':
+    async def get_progress_data(self, pupilid: int, date_begin: str, date_end: str, subjectid: int = 0) -> ProgressData:
         """Получить данные об успеваемости.
 
         Для получения данных аргументов См. get_account_info.
 
         Args:
-            pupilid (:obj:`int`): Уникальный идентификатор ученика.
-            date_begin (:obj:`int`): Год-Месяц-День, начала отсчёта.
-            date_end (:obj:`int`): Год-Месяц-День, конца отсчёта.
-            subjectid (:obj:`int`): Уникальный идентификатор предмета. 0 - общая статистика.
+            pupilid (`int`): Уникальный идентификатор ученика.
+            date_begin (`int`): Год-Месяц-День, начала отсчёта.
+            date_end (`int`): Год-Месяц-День, конца отсчёта.
+            subjectid (`int`): Уникальный идентификатор предмета. 0 - общая статистика.
 
         Returns:
-            :class:`ProgressData`: Данные об успеваемости.
+            `ProgressData`: Данные об успеваемости.
         """
 
         url = self.base_url + 'actions/web_edu.core.pupil.chart.ChartPack/progressdata'
@@ -432,7 +430,7 @@ class BClientAsync(ClientObject):
         """Получить информацию об учебном заведении.
 
         Returns:
-            :class:`BARS.SchoolInfo`: Информация о школе.
+            `BARS.SchoolInfo`: Информация о школе.
         """
 
         url = self.base_url + 'api/SchoolService/getSchoolInfo'
@@ -460,7 +458,7 @@ class BClientAsync(ClientObject):
         """Получить информацию о классе.
 
         Returns:
-            :class:`BARS.ClassInfo`: Информация о классе.
+            `BARS.ClassInfo`: Информация о классе.
         """
 
         url = self.base_url + 'api/SchoolService/getClassYearInfo'
@@ -477,21 +475,21 @@ class BClientAsync(ClientObject):
         if 'faultcode' in result.keys():
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
-                    raise Unauthorized('Недействительный sessionid')
+                    raise Unauthorized('Недействительный sessionid.')
                 case _:
                     raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
 
         return ClassInfo.de_json(result)
 
     @log
-    async def get_homework(self, date: str) -> Sequence['HomeworkDay']:
+    async def get_homework(self, date: str) -> Sequence[HomeworkDay]:
         """Получить данные из вкладки 'Домашнее задание'.
 
         Args:
-            date (:obj:`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
+            date (`str`): Дата формата Год-Месяц-День, неделя которой будет возвращена.
 
         Returns:
-            Sequence[:obj:`BARS.DiaryDay`]: Неделя домашнего задания.
+            Sequence[`BARS.DiaryDay`]: Неделя домашнего задания.
         """
 
         url = self.base_url + 'api/HomeworkService/GetHomeworkFromRange'
@@ -509,20 +507,22 @@ class BClientAsync(ClientObject):
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
-                    raise Unauthorized('Недействительный sessionid')
+                    raise Unauthorized('Недействительный sessionid.')
                 case _:
                     raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
-
-        for i, day in enumerate(result):
-            result[i] = HomeworkDay.de_json(day)
-        return result
+        elif isinstance(result, list):
+            for i, day in enumerate(result):
+                result[i] = HomeworkDay.de_json(day)
+            return result
+        else:
+            raise TypeError(f"Был получен непредусмотренный тип {type(result).__name__} вместо ожидаемого 'dict' или 'list'.")
 
     @log
-    async def get_birthdays(self) -> Optional[Sequence['Birthday']]:
+    async def get_birthdays(self) -> Sequence[Birthday]:
         """Получить список текущих дней рождений.
 
         Returns:
-            Sequence[:obj:`BARS.Birthday`], optional: Список текущих дней рождений. None если нет.
+            Sequence[`BARS.Birthday`], optional: Список текущих дней рождений. None если нет.
         """
 
         url = self.base_url + 'api/WidgetService/getBirthdays'
@@ -539,23 +539,22 @@ class BClientAsync(ClientObject):
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
-                    raise Unauthorized('Недействительный sessionid')
+                    raise Unauthorized('Недействительный sessionid.')
                 case _:
                     raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
-
-        try:
+        elif isinstance(result, list):
             for i, birthday in enumerate(result):
                 result[i] = Birthday.de_json(birthday)
             return result
-        except TypeError:
-            return None
+        else:
+            return []
 
     @log
-    async def get_events(self) -> Sequence['Event']:
+    async def get_events(self) -> Sequence[Event]:
         """Получить список текущих праздников.
 
         Returns:
-            Sequence[:obj:`BARS.Events`], optional: Неделя домашнего задания.
+            Sequence[`BARS.Events`], optional: Неделя домашнего задания.
         """
 
         url = self.base_url + 'api/WidgetService/getEvents'
@@ -572,13 +571,12 @@ class BClientAsync(ClientObject):
         if isinstance(result, dict) and 'faultcode' in result.keys():
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
-                    raise Unauthorized('Недействительный sessionid')
+                    raise Unauthorized('Недействительный sessionid.')
                 case _:
                     raise BClientException(f'Неизвестная ошибка :: {result['faultcode']}: {result['faultstring']}')
-
-        try:
+        elif isinstance(result, list):
             for i, event in enumerate(result):
                 result[i] = Event.de_json(event)
             return result
-        except TypeError:
+        else:
             return []

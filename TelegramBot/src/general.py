@@ -3,9 +3,13 @@ from typing import Optional
 from datetime import datetime
 from telegram import Update
 
+from .exceptions import TelegramBotError
+
 def get_user_from_db(update: Update) -> dict:
     """Получить поля пользователя из датабазы."""
-    with open('../db.json', 'r') as f:
+    if update.effective_user is None:
+        raise TelegramBotError("Не удалось получить запись из датабазы. Неизвестный пользователь.")
+    with open('..\\db.json', 'r') as f:
         contents: dict[str, dict] = dict(json.load(f))
         return contents[str(update.effective_user.id)]
 
@@ -13,15 +17,18 @@ def get_user_from_db(update: Update) -> dict:
 def update_db(dictionary: dict, update: Optional[Update] = None) -> None:
     """Обновить датабазу. Если update не указан, датабаза становиться данным словарём."""
 
-    with open('../db.json', 'r') as f:
+    with open('..\\db.json', 'r') as f:
         contents: dict[str, dict] = dict(json.load(f))
 
     if update:
+        if update.effective_user is None:
+            raise TelegramBotError()
+
         contents[str(update.effective_user.id)] = dictionary
-        with open('../db.json', 'w') as f:
+        with open('..\\db.json', 'w') as f:
             json.dump(contents, f)
     else:
-        with open('../db.json', 'w') as f:
+        with open('..\\db.json', 'w') as f:
             json.dump(dictionary, f)
 
 

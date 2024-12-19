@@ -1,13 +1,15 @@
+from datetime import datetime, timedelta
+
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-from datetime import datetime, timedelta
 
 import BARS
 from BARS import BClientAsync
 
-from TelegramBot.src.utils.general import update_db, get_user_from_db, get_school_start_year
-from TelegramBot.src.commands import get_diary, get_homework, get_schedule_day
-from TelegramBot.src.templates import (
+from ..exceptions import TelegramBotError
+from ..general import update_db, get_user_from_db, get_school_start_year
+from ..commands import get_diary, get_homework, get_schedule_day
+from ..templates import (
     ATTENDANCE_TEMPLATE,
     DIARY_BUTTONS, DIARY_LESSON_TEMPLATE,
     HOMEWORK_BUTTONS, HOMEWORK_LESSON_TEMPLATE,
@@ -18,7 +20,15 @@ from TelegramBot.src.templates import (
 async def process_sessionid(update: Update, user: dict) -> None:
     """Обработать ввод sessionid."""
 
-    async with BClientAsync(update.message.text) as client:
+    if update.message is None:
+        raise TelegramBotError()
+    
+    sessionid = update.message.text
+
+    if sessionid is None:
+        raise TelegramBotError()
+
+    async with BClientAsync(sessionid) as client:
         pupil_info: 'BARS.PupilInfo' = await client.get_pupil_info()
         acount_info: 'BARS.AccountInfo' = await client.get_account_info()
 
@@ -31,6 +41,11 @@ async def process_sessionid(update: Update, user: dict) -> None:
 
 async def process_attendancedata(update: Update, user: dict) -> None:
     """Обработать ввод данных для посещаемости."""
+
+    if update.message is None:
+        raise TelegramBotError()
+    elif update.message.text is None:
+        raise TelegramBotError()
 
     async with BClientAsync(user['sessionid']) as client:
         account: 'BARS.AccountInfo' = await client.get_account_info()
@@ -70,6 +85,11 @@ async def process_attendancedata(update: Update, user: dict) -> None:
 async def process_progressdata(update: Update, user: dict) -> None:
     """Обработать ввод данных для успеваемости."""
 
+    if update.message is None:
+        raise TelegramBotError()
+    elif update.message.text is None:
+        raise TelegramBotError()
+
     async with BClientAsync(user['sessionid']) as client:
         account: 'BARS.AccountInfo' = await client.get_account_info()
         if update.message.text.lower() == 'все':
@@ -107,20 +127,23 @@ async def process_diary(
 ) -> None:
     """Обработать кнопок смены дня дневника. ``step`` это сдвиг дня (1 следующий, -1 предыдущий)."""
 
+    if update.effective_message is None:
+        raise TelegramBotError()
+
     data: dict = user['diary_week']
-    next_index = data['current_weekday'] + step
+    next_index: int = data['current_weekday'] + step
 
     if next_index > 4:
         p_date = datetime.strptime(data['4'][0]['date'], '%d.%m.%Y')
         await get_diary(update, context, date=p_date.date(), delta=timedelta(3))
-        user: dict = get_user_from_db(update)
-        data: dict = user['diary_week']
+        user = get_user_from_db(update)
+        data = user['diary_week']
         next_index = 0
     elif next_index < 0:
         p_date = datetime.strptime(data['0'][0]['date'], '%d.%m.%Y')
         await get_diary(update, context, date=p_date.date(), delta=timedelta(-3))
-        user: dict = get_user_from_db(update)
-        data: dict = user['diary_week']
+        user = get_user_from_db(update)
+        data = user['diary_week']
         next_index = 4
 
     user['diary_week']['current_weekday'] = next_index
@@ -142,20 +165,23 @@ async def process_homework(
 ) -> None:
     """Обработать кнопок смены дня домашнего задания. ``step`` это сдвиг дня (1 следующий, -1 предыдущий)."""
 
+    if update.effective_message is None:
+        raise TelegramBotError()
+
     data: dict = user['homework_week']
-    next_index = data['current_weekday'] + step
+    next_index: int = data['current_weekday'] + step
 
     if next_index > 4:
         p_date = datetime.strptime(data['4'][0]['date'], '%d.%m.%Y')
         await get_homework(update, context, date=p_date.date(), delta=timedelta(3))
-        user: dict = get_user_from_db(update)
-        data: dict = user['homework_week']
+        user = get_user_from_db(update)
+        data = user['homework_week']
         next_index = 0
     elif next_index < 0:
         p_date = datetime.strptime(data['0'][0]['date'], '%d.%m.%Y')
         await get_homework(update, context, date=p_date.date(), delta=timedelta(-3))
-        user: dict = get_user_from_db(update)
-        data: dict = user['homework_week']
+        user = get_user_from_db(update)
+        data = user['homework_week']
         next_index = 4
 
     user['homework_week']['current_weekday'] = next_index
@@ -177,20 +203,23 @@ async def process_schedule(
 ) -> None:
     """Обработать кнопок смены дня расписания. ``step`` это сдвиг дня (1 следующий, -1 предыдущий)."""
     
+    if update.effective_message is None:
+        raise TelegramBotError()
+
     data: dict = user['schedule_week']
     next_index = data['current_weekday'] + step
 
     if next_index > 4:
         p_date = datetime.strptime(data['4'][0]['date'], '%d.%m.%Y')
         await get_schedule_day(update, context, date=p_date.date(), delta=timedelta(3))
-        user: dict = get_user_from_db(update)
-        data: dict = user['schedule_week']
+        user = get_user_from_db(update)
+        data = user['schedule_week']
         next_index = 0
     elif next_index < 0:
         p_date = datetime.strptime(data['0'][0]['date'], '%d.%m.%Y')
         await get_schedule_day(update, context, date=p_date.date(), delta=timedelta(-3))
-        user: dict = get_user_from_db(update)
-        data: dict = user['schedule_week']
+        user = get_user_from_db(update)
+        data = user['schedule_week']
         next_index = 4
 
     user['schedule_week']['current_weekday'] = next_index

@@ -8,18 +8,18 @@ class HomeworkLesson(ClientObject):
     """Класс, представляющий урок из домашнего задания.
 
     Attributes:
-        date (:obj:`str`): Дата формата День-Месяц-Год.
-        discipline (:obj:`str`): Название урока.
-        homework (:obj:`str`): Домашнее задание.
-        homework_time_to_complete (:obj:`int`): Время на выполнения д/з.
-        individual_homeworks (Sequence[:obj:`str`]): Индивидуальные задания.
-        materials (Sequence[:obj:`str`]): Неабсолютные ссылки на прикреплённые файлы.
-        next_individual_homeworks (Sequence[:obj:`str`]): Индивидуальные задания на следующий урок.
-        next_materials (Sequence[:obj:`str`]): Неабсолютные ссылки на прикреплённые файлы на следующий урок.
-        next_homework_time_to_complete (:obj:`int`): Время на выполнения д/з на следующий урок.
-        schedulelessontype (:obj:`str`): Вид работы.
-        teacher (:obj:`str`): Учитель, проводящий урок.
-        theme (:obj:`str`): Тема урока.
+        date (`str`): Дата формата День-Месяц-Год.
+        discipline (`str`): Название урока.
+        homework (`str`): Домашнее задание.
+        homework_time_to_complete (`int`): Время на выполнения д/з.
+        individual_homeworks (Sequence[`str`]): Индивидуальные задания.
+        materials (Sequence[`str`]): Неабсолютные ссылки на прикреплённые файлы.
+        next_individual_homeworks (Sequence[`str`]): Индивидуальные задания на следующий урок.
+        next_materials (Sequence[`str`]): Неабсолютные ссылки на прикреплённые файлы на следующий урок.
+        next_homework_time_to_complete (`int`): Время на выполнения д/з на следующий урок.
+        schedulelessontype (`str`): Вид работы.
+        teacher (`str`): Учитель, проводящий урок.
+        theme (`str`): Тема урока.
     """
 
     date: str
@@ -38,7 +38,7 @@ class HomeworkLesson(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'HomeworkLesson':
 
@@ -60,18 +60,18 @@ class HomeworkDay(ClientObject):
     """Класс, представляющий день из дневника.
 
     Attributes:
-        date (:obj:`str`): Дата формата Год-Месяц-День.
-        homeworks (Sequence[:class:`BARS.HomeworkLesson`]): Д/З на этот день.
-        name (:obj:`str`): Название дня недели.
+        date (`str`): Дата формата Год-Месяц-День.
+        homeworks (Sequence[`BARS.HomeworkLesson`]): Д/З на этот день.
+        name (`str`): Название дня недели.
     """
 
     date: str
-    homeworks: Sequence['HomeworkLesson']
+    homeworks: Sequence[HomeworkLesson]
     name: str
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'HomeworkDay':
 

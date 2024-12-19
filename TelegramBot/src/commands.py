@@ -6,11 +6,12 @@ from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 import BARS
-import templates
 from BARS import BClientAsync
-from utils.general import get_user_from_db, update_db, escape_illegal_chars
-from utils.commands_utils import proccess_diary, proccess_homework, proccess_schedule
 
+from .exceptions import TelegramBotError
+from .general import get_user_from_db, update_db, escape_illegal_chars
+from .utils.commands_utils import proccess_diary, proccess_homework, proccess_schedule
+from . import templates
 
 # TODO: Добавить опцию для учёта субботы
 
@@ -18,12 +19,17 @@ from utils.commands_utils import proccess_diary, proccess_homework, proccess_sch
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Инициализация пользователя в датабазе. Вывод доступных команд."""
 
+    if update.effective_message is None or update.message is None:
+        raise TelegramBotError("Не удалось получить запись из датабазы. Неизвестное сообщение.")
+    elif update.message.from_user is None:
+        raise TelegramBotError("Не удалось получить запись из датабазы. Неизвестный пользователь.")
+
     await update.effective_message.reply_text(templates.WELCOME_TEXT, parse_mode='Markdown')
     try:
-        with open('../db.json', 'r') as f:
-            contents = dict(json.load(f))
+        with open('..\\db.json', 'r') as f:
+            contents: dict = dict(json.load(f))
     except FileNotFoundError:
-        with open('../db.json', 'w') as f:
+        with open('..\\db.json', 'w') as f:
             json.dump({}, f)
         contents = {}
 
@@ -35,6 +41,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def set_sessionid(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команда /set_sessionid. Устанавливает sessionid. Записывает в датабазу."""
+
+    if update.message is None:
+        raise TelegramBotError("Не удалось выполнить комманду. Неизвестное сообщение.")
 
     reply_markup = InlineKeyboardMarkup(templates.SID_BUTTON)
     await update.message.reply_text('Введите sessionid', reply_markup=reply_markup)
@@ -52,12 +61,8 @@ async def get_diary(
 ) -> None:
     """Комманда /get_diary. Выводит неделю из дневника.
 
-    ``date`` указывется для указания точки смещения. Если значение пустое, используется сегодняшний день.
-    ``delta`` указывается для смещения времени при достижении края недели.
-
-    Добавляет в поле пользователя ``{'diary_week': {'current_weekday': 0-4, i: [{date: str, discipline: str, theme: str, mark_info: str, comment: str remarks: str},...],... }}``
-    
-    где ``i`` - индекс дня (0-4, строка). Суббота исключается.
+    * ``date`` указывется для указания точки смещения. Если значение пустое, используется сегодняшний день.
+    * ``delta`` указывается для смещения времени при достижении края недели.
 
     Использует Inline клавиатуру."""
 
@@ -79,10 +84,8 @@ async def get_diary(
 
     reply_markup = InlineKeyboardMarkup([*templates.DIARY_BUTTONS])
 
-    try:
+    if update.message is not None:
         await update.message.reply_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
-    except AttributeError:  # При переходе на другую неделю сообщение None
-        return
 
 
 async def get_homework(
@@ -94,11 +97,8 @@ async def get_homework(
 ) -> None:
     """Комманда /get_homework. Выводит домашнее задание.
 
-    ``date`` указывется для указания точки смещения. Если значение пустое, используется сегодняшний день.
-    ``delta`` указывается для смещения времени при достижении края недели.
-
-     Записывает в датабазу: ``{'homework_week': {'current_weekday': 0-4, i: [Последовательность д/з]}}``,
-     где ``i`` - индекс дня (0-4, строка). Суббота исключается.
+    * ``date`` указывется для указания точки смещения. Если значение пустое, используется сегодняшний день.
+    * ``delta`` указывается для смещения времени при достижении края недели.
 
      Использует Inline клавиатуру."""
 
@@ -112,7 +112,7 @@ async def get_homework(
     result_dict: dict = {'current_weekday': date.weekday()}
 
     async with BClientAsync(user['sessionid']) as client:
-        homework: Sequence['BARS.HomeworkDay'] = await client.get_homework(date)
+        homework: Sequence[BARS.HomeworkDay] = await client.get_homework(date)
 
     send_text: str = proccess_homework(result_dict, homework, client.base_url, date)
     user['homework_week'] = result_dict
@@ -120,10 +120,8 @@ async def get_homework(
 
     reply_markup = InlineKeyboardMarkup([*templates.HOMEWORK_BUTTONS])
 
-    try:
+    if update.message is not None:
         await update.message.reply_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
-    except AttributeError:  # При переходе на другую неделю сообщение None
-        return
 
 
 async def get_schedule_day(
@@ -156,14 +154,15 @@ async def get_schedule_day(
 
     reply_markup = InlineKeyboardMarkup([*templates.SCHEDULE_DAY_BUTTONS])
 
-    try:
+    if update.message is not None:
         await update.message.reply_text(send_text, parse_mode='Markdown', reply_markup=reply_markup)
-    except AttributeError:  # При переходе на другую неделю сообщение None
-        return
 
 
 async def get_summary_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команда /get_simmary_marks. Сводные оценки."""
+    
+    if update.message is None:
+        raise TelegramBotError()
 
     user: dict = get_user_from_db(update)
     async with BClientAsync(user['sessionid']) as client:
@@ -187,18 +186,22 @@ async def get_total_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     async with BClientAsync(user['sessionid']) as client:
         total_marks: 'BARS.TotalMarks' = await client.get_total_marks()
 
-    period: 'BARS.Subperiod'  # Четверть
-    discipline_mark: 'BARS.TotalMarksDiscipline'  # Сборник оценок по предмету
+    subperiod: BARS.Subperiod  # Четверть
+    discipline_mark: BARS.TotalMarksDiscipline  # Сборник оценок по предмету
     i: int  # Индекс четверти
+    code: str # Код четверти
     # Конвертация запутанная, т.к. API был создан только для работы с таблицей на самом сайте.
-
-    for period, discipline_mark, i in zip(total_marks.subperiods, total_marks.disciplines, range(4)):
-        text: str = '\n' + period.name + '\n'
-
-        if discipline_mark.period_marks:
-            text += f"{discipline_mark.discipline}: {discipline_mark.period_marks[i]}\n"
-        else:
-            text += 'Оценок нет\n'
+    for i, code, subperiod in zip(range(4), ('1_1', '1_2', '1_3', '1_4'), total_marks.subperiods):
+        text: str = ""
+        text = '\n*' + subperiod.name + '*\n'
+        for discipline_mark in total_marks.disciplines:
+            for mark in discipline_mark.period_marks:
+                if mark['subperiod_code'] == code:
+                    text += f"{discipline_mark.discipline}: {mark['mark']}\n"
+                    break
+            else:
+                text += 'Оценок нет\n'
+                break
         total_marks_dict[i] = text
 
     user['total_marks'] = total_marks_dict
@@ -208,22 +211,29 @@ async def get_total_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         [templates.TOTAL_MARKS_BUTTONS[0], templates.TOTAL_MARKS_BUTTONS[1]],
         [templates.TOTAL_MARKS_BUTTONS[2], templates.TOTAL_MARKS_BUTTONS[3]]
     ])
-    await update.message.reply_text('Выберите четверть', reply_markup=reply_markup)
+    if update.message is not None:
+        await update.message.reply_text('Выберите четверть', reply_markup=reply_markup)
 
 
 async def get_attendance_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команда /get_attendance_data. Данные о посещаемости. Использует обработчик сообщений."""
 
-    await update.message.reply_text('Введите название предмета или `Все` для общей статистики')
+    if update.message is None:
+        raise TelegramBotError()
+
     user: dict = get_user_from_db(update)
     user['current_operation'] = 'attendancedata'
     update_db(user, update)
+    await update.message.reply_text('Введите название предмета или `Все` для общей статистики.')
 
 
 async def get_progress_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команда /get_progress_data. Данные об успеваемости. Использует обработчик сообщений."""
 
-    await update.message.reply_text('Введите название предмета или `Все` для общей статистики')
+    if update.message is None:
+        raise TelegramBotError()
+
+    await update.message.reply_text('Введите название предмета или `Все` для общей статистики.')
     user: dict = get_user_from_db(update)
     user['current_operation'] = 'progressdata'
     update_db(user, update)
@@ -231,19 +241,22 @@ async def get_progress_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
 async def get_school_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команда /get_school_info. Информация о школе."""
+    
+    if update.message is None:
+        raise TelegramBotError()
 
     user: dict = get_user_from_db(update)
     async with BClientAsync(user['sessionid']) as client:
-        school_info: 'BARS.SchoolInfo' = await client.get_school_info()
+        school_info: BARS.SchoolInfo = await client.get_school_info()
 
-    send_text: str = f"*{escape_illegal_chars(school_info.name)}*\n\n"
-    send_text += templates.SCHOOL_INFO_TEMPLATE.format(
-        escape_illegal_chars(school_info.address),
-        escape_illegal_chars(school_info.phone),
-        escape_illegal_chars(school_info.site_url),
-        str(school_info.count_employees),
-        str(school_info.count_pupils),
-        escape_illegal_chars(school_info.email)
+    send_text: str = templates.SCHOOL_INFO_TEMPLATE.format(
+        name=escape_illegal_chars(school_info.name),
+        address=escape_illegal_chars(school_info.address),
+        phone_number=escape_illegal_chars(school_info.phone),
+        website=escape_illegal_chars(school_info.site_url),
+        employees=str(school_info.count_employees),
+        students=str(school_info.count_pupils),
+        email=escape_illegal_chars(school_info.email)
     )
     await update.message.reply_text(send_text, parse_mode='Markdown')
 
@@ -251,10 +264,13 @@ async def get_school_info(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 async def get_class_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команада /get_class_info. Информация о классе."""
 
+    if update.message is None:
+        raise TelegramBotError()
+
     user: dict = get_user_from_db(update)
 
     async with BClientAsync(user['sessionid']) as client:
-        class_info: 'BARS.ClassInfo' = await client.get_class_info()
+        class_info: BARS.ClassInfo = await client.get_class_info()
 
     pupils: Sequence[str] = [pupil.fullname for pupil in class_info.pupils]
     send_text: str = templates.CLASS_INFO_TEMPLATE.format(
@@ -271,12 +287,15 @@ async def get_class_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def get_birthdays(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команда /get_birthdays. Текущие дни рождения."""
 
+    if update.message is None:
+        raise TelegramBotError()
+
     user: dict = get_user_from_db(update)
 
     async with BClientAsync(user['sessionid']) as client:
-        birthdays: Sequence['BARS.Birthday'] = await client.get_birthdays()
+        birthdays: Sequence[BARS.Birthday] = await client.get_birthdays()
 
-    send_text: str = "Дни Рождения:\n" if birthdays else "Дни Рождения отсутствуют"
+    send_text: str = "Дни Рождения:\n" if birthdays else "Дни Рождения отсутствуют."
 
     for birthday in birthdays:
         send_text += f"*{birthday.date}*\n{escape_illegal_chars(birthday.short_name)}\n\n"
@@ -287,12 +306,15 @@ async def get_birthdays(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 async def get_events(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команда /get_events. Текущие события/праздники."""
 
+    if update.message is None:
+        raise TelegramBotError()
+
     user: dict = get_user_from_db(update)
 
     async with BClientAsync(user['sessionid']) as client:
-        events: Sequence['BARS.Event'] = await client.get_events()
+        events: Sequence[BARS.Event] = await client.get_events()
 
-    send_text: str = "Текущие мероприятия:\n" if events else "Мероприятия отсутствуют"
+    send_text: str = "Текущие мероприятия:\n" if events else "Мероприятия отсутствуют."
 
     for event in events:
         send_text += f"*{escape_illegal_chars(event.date_str)}*\n{escape_illegal_chars(event.theme)}\n\n"

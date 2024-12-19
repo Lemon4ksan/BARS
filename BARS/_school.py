@@ -8,12 +8,12 @@ class Employee(ClientObject):
     """Класс, представляющий данные работника учебного заведения.
 
     Attributes:
-        group (:obj:`str`): Группа
-        fullname (:obj:`str`): ФИО.
-        category (:obj:`str`): Категория.
-        employer_jobs (Sequence[:obj:`str`]): Список работ.
-        male (:obj:`bool`): Является ли работник мужчиной.
-        photo (:obj:`str`): Неабсолютная ссылка на прикреплённое фото.
+        group (`str`): Группа
+        fullname (`str`): ФИО.
+        category (`str`): Категория.
+        employer_jobs (Sequence[`str`]): Список работ.
+        male (`bool`): Является ли работник мужчиной.
+        photo (`str`): Неабсолютная ссылка на прикреплённое фото.
     """
 
     group: str
@@ -25,17 +25,9 @@ class Employee(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'Employee':
-        """Десериализация объекта.
-
-        Args:
-            data (:obj:`dict`): Поля и значения десериализуемого объекта.
-
-        Returns:
-            :class:`BARS.Employee`: Данные работника.
-        """
 
         data = super(Employee, cls).de_json(data)
 
@@ -46,16 +38,16 @@ class SchoolInfo(ClientObject):
     """Класс, представляющий данные об учебном заведении.
 
     Attributes:
-        name (:obj:`str`): Название.
-        address (:obj:`str`): Адрес.
-        phone (:obj:`str`): Номер телефона.
-        site_url (:obj:`str`): Абсолютная ссылка на сайт школы.
-        count_employees (:obj:`int`): Кол-во рабочего персонала.
-        count_pupils (:obj:`int`): Кол-во учашихся.
-        photo (:obj:`str`): Неабсолютная ссылка на прикреплённое фото.
-        email (:obj:`str`): Электронная почта.
-        ustav (:obj:`str`): Неабсолютная ссылка на устав УЗ.
-        employees (Sequence[:class:`BARS.Employee`]): Рабочий персонал.
+        name (`str`): Название.
+        address (`str`): Адрес.
+        phone (`str`): Номер телефона.
+        site_url (`str`): Абсолютная ссылка на сайт школы.
+        count_employees (`int`): Кол-во рабочего персонала.
+        count_pupils (`int`): Кол-во учашихся.
+        photo (`str`): Неабсолютная ссылка на прикреплённое фото.
+        email (`str`): Электронная почта.
+        ustav (`str`): Неабсолютная ссылка на устав УЗ.
+        employees (Sequence[`BARS.Employee`]): Рабочий персонал.
     """
 
     name: str
@@ -67,11 +59,11 @@ class SchoolInfo(ClientObject):
     photo: str
     email: str
     ustav: str
-    employees: Sequence['Employee']
+    employees: Sequence[Employee]
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'SchoolInfo':
 
@@ -87,9 +79,9 @@ class Pupil(ClientObject):
     """Класс, представляющий данные ученика.
 
     Attributes:
-        fullname (:obj:`str`): ФИО.
-        photo (:obj:`str`): Неабсолютная ссылка на прикреплённое изображение.
-        male (:obj:`bool`): Является ли ученик мужиной.
+        fullname (`str`): ФИО.
+        photo (`str`): Неабсолютная ссылка на прикреплённое изображение.
+        male (`bool`): Является ли ученик мужиной.
     """
 
     fullname: str
@@ -98,7 +90,7 @@ class Pupil(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'Pupil':
 
@@ -111,14 +103,14 @@ class ClassInfo(ClientObject):
     """Класс, представляющий данные о классе.
 
     Attributes:
-        study_level (:obj:`int`): Цифра класса.
-        letter (:obj:`str`): Буква класса.
-        form_master (:obj:`str`): ФИО классного руководителя
-        form_master_photo (:obj:`str`): Неабсолютная ссылка на прикреплённое изображение классного руководителя.
-        form_master_male (:obj:`bool`): Является ли классный руководитель мужчиной.
-        specialization (:obj:`str`): Направление класса.
-        photo (:obj:`str`): Неабсолютная ссылка на прикреплённое изображение класса.
-        pupils (Sequence[:class:`BARS.Pupil`]): Ученики.
+        study_level (`int`): Цифра класса.
+        letter (`str`): Буква класса.
+        form_master (`str`): ФИО классного руководителя
+        form_master_photo (`str`): Неабсолютная ссылка на прикреплённое изображение классного руководителя.
+        form_master_male (`bool`): Является ли классный руководитель мужчиной.
+        specialization (`str`): Направление класса.
+        photo (`str`): Неабсолютная ссылка на прикреплённое изображение класса.
+        pupils (Sequence[`BARS.Pupil`]): Ученики.
     """
 
     study_level: int
@@ -128,11 +120,11 @@ class ClassInfo(ClientObject):
     form_master_male: bool
     specialization: str
     photo: str
-    pupils: Sequence['Pupil']
+    pupils: Sequence[Pupil]
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'ClassInfo':
 

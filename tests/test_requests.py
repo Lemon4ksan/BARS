@@ -1,4 +1,3 @@
-import logging
 import unittest
 import datetime
 import BARS
@@ -10,8 +9,12 @@ load_dotenv()
 class IndependentTests(unittest.TestCase):
 
     def setUp(self):
-        self.client = BARS.BClient(os.getenv('SESSIONID'))
-        self.pupilid = int(os.getenv('PUPILID'))
+        sesid = os.getenv('SESSIONID')
+        pupid = os.getenv('PUPILID')
+        if sesid is None or pupid is None:
+            raise ValueError("ID сессии и PupilID необходимо указать в переменных среды.")
+        self.client = BARS.BClient(sesid)
+        self.pupilid = int(pupid)
         self.today = str(datetime.date.today())
 
     def test_get_diary(self):

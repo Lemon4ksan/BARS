@@ -9,25 +9,25 @@ class ScheduleLesson(ClientObject):
     """Класс, представляющий урок из дневника.
 
     Attributes:
-        id (:obj:`int`, optional): Уникальный идентификатор задания. Может быть пустым.
-        date (:obj:`str`): Дата формата День-Месяц-Год.
-        discipline (:obj:`str`): Название урока.
-        has_auth_sferum (:obj:`bool`, optional): Есть ли регистрация в Сферум. Может быть пустым.
-        index (:obj:`int`): Порядок урока в расписании.
-        is_control_work (:obj:`bool`): Является ли работа контрольной.
-        office (:obj:`str`, optional): Кабинет проведения урока. Может быть пустым.
-        study_time_name (:obj:`str`, optional): Название временной смены. Может быть пустым.
-        study_time_shift (:obj:`int`, optional): Временная смена. Может быть пустым.
-        teacher (:obj:`str`, optional): Учитель, проводящий урок. Может быть пустым.
-        time_begin (:obj:`str`, optional): Часы-Минуты начала урока. Может быть пустым.
-        time_end (:obj:`str`, optional): Часы-Минуты конца урока. Может быть пустым.
+        ID (`int`, optional): Уникальный идентификатор задания. Может быть пустым.
+        date (`str`): Дата формата День-Месяц-Год.
+        discipline (`str`): Название урока.
+        has_auth_sferum (`bool`, optional): Есть ли регистрация в Сферум. Может быть пустым.
+        index (`int`): Порядок урока в расписании.
+        is_control_work (`bool`): Является ли работа контрольной.
+        office (`str`, optional): Кабинет проведения урока. Может быть пустым.
+        study_time_name (`str`, optional): Название временной смены. Может быть пустым.
+        study_time_shift (`int`, optional): Временная смена. Может быть пустым.
+        teacher (`str`, optional): Учитель, проводящий урок. Может быть пустым.
+        time_begin (`str`, optional): Часы-Минуты начала урока. Может быть пустым.
+        time_end (`str`, optional): Часы-Минуты конца урока. Может быть пустым.
     """
 
     date: str
     discipline: str
     index: int
     is_control_work: bool
-    id: Optional[int] = None
+    ID: Optional[int] = None
     has_auth_sferum: Optional[bool] = None
     office: Optional[str] = None
     study_time_name: Optional[str] = None
@@ -38,7 +38,7 @@ class ScheduleLesson(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'ScheduleLesson':
 
@@ -51,20 +51,20 @@ class ScheduleDay(ClientObject):
     """Класс, представляющий расписание на день.
 
     Attributes:
-        date (:obj:`str`): Дата формата Год-Месяц-День.
-        lessons (Sequence[:class:`BARS.DiaryLesson`, optional], optional): Уроки на этот день.
+        date (`str`): Дата формата Год-Месяц-День.
+        lessons (Sequence[`BARS.DiaryLesson`, optional], optional): Уроки на этот день.
             None, если выходной или каникулы.
-        is_weekend (:obj:`bool`): Является ли данный день выходным.
+        is_weekend (`bool`): Является ли данный день выходным.
         """
 
     date: str
-    lessons: Sequence['ScheduleLesson']
+    lessons: Sequence[ScheduleLesson]
     is_weekend: bool = False
     is_vacation: bool = False
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'ScheduleDay':
         try:
@@ -81,16 +81,16 @@ class ScheduleMonth(ClientObject):
     """Класс, представляющий расписание на день.
 
     Attributes:
-        days (Sequence[:class:`BARS.ScheduleDay`]): Последовательность дней недели.
-        index (:obj:`int`): Порядок недели.
+        days (Sequence[`BARS.ScheduleDay`]): Последовательность дней недели.
+        index (`int`): Порядок недели.
     """
 
-    days: Sequence['ScheduleDay']
+    days: Sequence[ScheduleDay]
     index: int
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'ScheduleMonth':
 

@@ -7,9 +7,9 @@ class Event(ClientObject):
     """Класс, представляющий праздник.
 
     Attributes:
-        date (:obj:`str`): Дата формата Год-Месяц-День.
-        date_str (:obj:`str`): Дата формата День-Месяц-Год.
-        theme (:obj:`str`): Название праздника.
+        date (`str`): Дата формата Год-Месяц-День.
+        date_str (`str`): Дата формата День-Месяц-Год.
+        theme (`str`): Название праздника.
     """
 
     date: str
@@ -18,7 +18,7 @@ class Event(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'Event':
 
@@ -31,10 +31,10 @@ class Birthday(ClientObject):
     """Класс, представляющий день рождения.
 
     Attributes:
-        date (:obj:`str`): Дата формата Год-Месяц-День.
-        male (:obj:`bool`): Является ли именинник мужчиной.
-        photo (:obj:`str`): Неабсолютная ссылка на фото ученика.
-        short_name (:obj:`str`): Фамилия И.О.
+        date (`str`): Дата формата Год-Месяц-День.
+        male (`bool`): Является ли именинник мужчиной.
+        photo (`str`): Неабсолютная ссылка на фото ученика.
+        short_name (`str`): Фамилия И.О.
     """
 
     date: str
@@ -44,7 +44,7 @@ class Birthday(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'Birthday':
 

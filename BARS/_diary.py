@@ -9,27 +9,27 @@ class DiaryLesson(ClientObject):
     """Класс, представляющий урок из дневника.
 
     Attributes:
-        id (:obj:`int`): Уникальный идентификатор задания.
-        date (:obj:`str`): Дата формата Год-Месяц-День.
-        attendance (:obj:`str`): Замечание об отсутствии на занятии.
-        comment (:obj:`str`): Комментарий оценки.
-        discipline (:obj:`str`): Название урока.
-        homework_time_to_complete (:obj:`int`): Время на выполнения д/з.
-        ind_homework_exists (:obj:`bool`): Присутствует ли индивидуальное д/з.
-        index (:obj:`int`): Порядок урока в расписании.
-        is_control_work (:obj:`bool`): Является ли урок контрольным.
-        mark (:obj:`str`): Оценка.
-        mark_type (:obj:`str`): Тип оценки.
-        materials (Sequence[:obj:`str`]): Неабсолютные ссылки на прикреплённые файлы.
-        office (:obj:`str`): Кабинет проведения урока.
-        remarks (:obj:`str`): Замечания.
-        schedulelessontype (:obj:`str`): Вид работы.
-        study_time_name (:obj:`str`): Название временной смены.
-        study_time_shift (:obj:`int`): Временная смена.
-        teacher (:obj:`str`): Учитель, проводящий урок.
-        theme (:obj:`str`): Тема урока.
-        time_begin (:obj:`str`): Часы-Минуты начала урока.
-        time_end (:obj:`str`): Часы-Минуты конца урока.
+        id (`int`): Уникальный идентификатор задания.
+        date (`str`): Дата формата Год-Месяц-День.
+        attendance (`str`): Замечание об отсутствии на занятии.
+        comment (`str`): Комментарий оценки.
+        discipline (`str`): Название урока.
+        homework_time_to_complete (`int`): Время на выполнения д/з.
+        ind_homework_exists (`bool`): Присутствует ли индивидуальное д/з.
+        index (`int`): Порядок урока в расписании.
+        is_control_work (`bool`): Является ли урок контрольным.
+        mark (`str`): Оценка.
+        mark_type (`str`): Тип оценки.
+        materials (Sequence[`str`]): Неабсолютные ссылки на прикреплённые файлы.
+        office (`str`): Кабинет проведения урока.
+        remarks (`str`): Замечания.
+        schedulelessontype (`str`): Вид работы.
+        study_time_name (`str`): Название смены.
+        study_time_shift (`int`): Номер смены.
+        teacher (`str`): Учитель, проводящий урок.
+        theme (`str`): Тема урока.
+        time_begin (`str`): Часы-Минуты начала урока.
+        time_end (`str`): Часы-Минуты конца урока.
     """
 
     id: int
@@ -57,7 +57,7 @@ class DiaryLesson(ClientObject):
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'DiaryLesson':
 
@@ -70,20 +70,21 @@ class DiaryDay(ClientObject):
     """Класс, представляющий день из дневника.
 
     Attributes:
-        date (:obj:`str`): Дата формата Год-Месяц-День.
-        lessons (Sequence[:class:`BARS.DiaryLesson`, optional], optional): Уроки на этот день.
+        date (`str`): Дата формата Год-Месяц-День.
+        lessons (Sequence[`BARS.DiaryLesson`, optional], optional): Уроки на этот день.
             None, если выходной или каникулы.
-        is_weekend (:obj:`bool`): Является ли данный день выходным.
+        is_weekend (`bool`): Является ли данный день выходным.
+        is_vacation (`bool`): Является ли данный день праздником/частью каникул.
     """
 
     date: str
-    lessons: Sequence['DiaryLesson']
+    lessons: Sequence[DiaryLesson]
     is_weekend: bool = False
     is_vacation: bool = False
 
     @classmethod
     def de_json(
-            cls: dataclass,
+            cls,
             data: dict,
     ) -> 'DiaryDay':
 

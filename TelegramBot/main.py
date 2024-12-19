@@ -6,9 +6,8 @@ from dotenv import load_dotenv
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler
 from telegram.ext.filters import ALL
 
-from commands import *
-from handlers import handle_callback, handle_exception, handle_message
-
+from src.commands import *
+from src.handlers import handle_message, handle_callback, handle_exception
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.WARNING)
@@ -17,7 +16,10 @@ if __name__ == '__main__':
     coloredlogs.install()
 
     load_dotenv()
-    application = ApplicationBuilder().token(os.getenv('TELEGRAM_TOKEN')).build()
+    token = os.getenv('TELEGRAM_TOKEN')
+    if token is None:
+        raise ValueError('Токен должен быть указан в переменных среды.')
+    application = ApplicationBuilder().token(token).build()
 
     start_handler = CommandHandler(('start', 'help'), start)
     set_sessionid_handler = CommandHandler('set_sessionid', set_sessionid)

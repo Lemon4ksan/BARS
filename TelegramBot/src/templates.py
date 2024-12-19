@@ -1,5 +1,5 @@
-from telegram import InlineKeyboardButton
 from collections.abc import Sequence
+from telegram import InlineKeyboardButton
 
 USER_DICT: dict = {
     'sessionid': None,
@@ -13,7 +13,7 @@ USER_DICT: dict = {
 
 WELCOME_TEXT: str = r"""Этот бот позволит вам пользоваться сервисами БАРС альтернативным способом.
 
-*Настройка*
+*Настройки*
 /set\_sessionid - Установить ID сессии
 
 *Уроки*
@@ -46,7 +46,7 @@ WHAT_IS_SID: str = """sessionid - это идентификатор вашей �
 
 Чтобы сессия не заканчивалась, измените её дату истекания (Expires/Max-Age) на [ГОД]-04-18T13:10:00.000Z заменив [ГОД] на следующий."""
 
-SID_BUTTON: Sequence[Sequence['InlineKeyboardButton']] = [[InlineKeyboardButton(text='Что такое sessionid?', callback_data='about_sid')]]
+SID_BUTTON: Sequence[Sequence[InlineKeyboardButton]] = [[InlineKeyboardButton(text='Что такое sessionid?', callback_data='about_sid')]]
 
 DIARY_LESSON_TEMPLATE: str = """\n*{discipline}*{theme}{mark_info}{comment}{remarks}{attendance}\n"""
 
@@ -54,12 +54,8 @@ HOMEWORK_LESSON_TEMPLATE: str = """\n*{discipline}*\n{homework} {time_to_complet
 
 SCHEDULE_DAY_TEMPLATE: str = """\n*{discipline}*\n{teacher}\n{office}\n{start}-{end}\n"""
 
-SCHOOL_INFO_TEMPLATE: str = """Адрес: {}
-Номер телефона: {}
-Сайт школы: {}
-Кол-во рабочих: {}
-Кол-во учашихся: {}
-Почта: {}"""
+SCHOOL_INFO_TEMPLATE: str = "*{name}*\n\nАдрес: {address}\nНомер телефона: {phone_number}\n" \
+    "Сайт школы: {website}\nКол-во рабочих: {employees}\nКол-во учащихся: {students}\nПочта: {email}"
 
 CLASS_INFO_TEMPLATE: str = """*{}{}*
 Классный руководитель: {}
@@ -73,22 +69,22 @@ ATTENDANCE_TEMPLATE: str = """Всего: {}
 По неуважительной причине: {}
 По болезни: {}"""
 
-DIARY_BUTTONS: Sequence[Sequence['InlineKeyboardButton']] = [
+DIARY_BUTTONS: Sequence[Sequence[InlineKeyboardButton]] = [
     [InlineKeyboardButton(text='Предыдущий день', callback_data='diary_previous_day'),
      InlineKeyboardButton(text='Следующий день', callback_data='diary_next_day')],
 ]
 
-HOMEWORK_BUTTONS: Sequence[Sequence['InlineKeyboardButton']] = [
+HOMEWORK_BUTTONS: Sequence[Sequence[InlineKeyboardButton]] = [
     [InlineKeyboardButton(text='Предыдущий день', callback_data='homework_previous_day'),
      InlineKeyboardButton(text='Следующий день', callback_data='homework_next_day')],
 ]
 
-SCHEDULE_DAY_BUTTONS: Sequence[Sequence['InlineKeyboardButton']] = [
+SCHEDULE_DAY_BUTTONS: Sequence[Sequence[InlineKeyboardButton]] = [
     [InlineKeyboardButton(text='Предыдущий день', callback_data='schedule_previous_day'),
      InlineKeyboardButton(text='Следующий день', callback_data='schedule_next_day')],
 ]
 
-TOTAL_MARKS_BUTTONS: Sequence['InlineKeyboardButton'] = [
+TOTAL_MARKS_BUTTONS: Sequence[InlineKeyboardButton] = [
     InlineKeyboardButton(text='1 Четверть', callback_data='total_marks_subperiod1'),
     InlineKeyboardButton(text='2 Четверть', callback_data='total_marks_subperiod2'),
     InlineKeyboardButton(text='3 Четверть', callback_data='total_marks_subperiod3'),

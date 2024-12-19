@@ -3,18 +3,15 @@ import logging
 import re
 from bs4 import BeautifulSoup
 from abc import ABCMeta
-from dataclasses import dataclass
-from typing import Optional, TypeVar
+from typing import Self, Any
 from collections.abc import MutableSequence
-
-_BT = TypeVar('_BT')
 
 class ClientObject:
     """Базовый класс для всех объектов библиотеки."""
 
     __metaclass__ = ABCMeta
 
-    def remove_html_tags(self, __obj: _BT = '__dataclass__', *, replace_p_with='\n') -> _BT:
+    def remove_html_tags(self, __obj: str | dict | MutableSequence | Self = '__dataclass__', *, replace_p_with='\n') -> str | dict | MutableSequence | Self:
         """Преобразует словари, изменяемые последовательности, классы и строки в читабельный формат, без HTML тегов.
         Также заменяет теги <a> на гиперссылки для отправки в Телеграм.
 
@@ -30,7 +27,9 @@ class ClientObject:
             links = re.findall(r'<a href="[^"]+">.+[</a>]', __obj)
             for link in links:  # Заменяет теги <a> на гиперссылки
                 tag = BeautifulSoup(link, 'lxml').find('a')
-                __obj = __obj.replace(link, f'[{tag.text}]({tag.get('href')}) ')
+                if tag is None:
+                    raise ValueError("Произошла внутрення ошибка. Найденные ссылки и теги не совпадают.")
+                __obj = __obj.replace(link, f'[{tag.text}]({tag.get('href')}) ')  # pyright: ignore Проблема с bs4
             __obj = re.sub(r'<[^>]+>', '', __obj.replace('<p', f'{replace_p_with}<p'))
             if replace_p_with == ' ':
                 __obj = __obj.replace('  ', ' ')  # исключаем двойные <p>
@@ -48,7 +47,7 @@ class ClientObject:
         return __obj
 
     @classmethod
-    def de_json(cls: dataclass, data: dict) -> Optional[dict]:
+    def de_json(cls, data: dict) -> Any:
         """Десериализация объекта.
 
         Args:
@@ -57,6 +56,9 @@ class ClientObject:
         Returns:
             :obj:`dict`, optional: Словарь с валидными аттрибутами для создания датакласса.
         """
+
+        if not dataclasses.is_dataclass(cls):
+            raise TypeError("Ожидался датакласс.")
 
         data = data.copy()
 
