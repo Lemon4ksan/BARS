@@ -29,8 +29,8 @@ async def process_sessionid(update: Update, user: dict) -> None:
         raise TelegramBotError()
 
     async with BClientAsync(sessionid) as client:
-        pupil_info: 'BARS.PupilInfo' = await client.get_pupil_info()
-        acount_info: 'BARS.AccountInfo' = await client.get_account_info()
+        pupil_info: BARS.PupilInfo = await client.get_pupil_info()
+        acount_info: BARS.AccountInfo = await client.get_account_info()
 
     name: str = pupil_info.user_fullname.split()[1]
     await update.message.reply_text(f'Привет, {name}!')
@@ -48,21 +48,21 @@ async def process_attendancedata(update: Update, user: dict) -> None:
         raise TelegramBotError()
 
     async with BClientAsync(user['sessionid']) as client:
-        account: 'BARS.AccountInfo' = await client.get_account_info()
+        account: BARS.AccountInfo = await client.get_account_info()
         if update.message.text.lower() == 'все':
             subjectid: int = 0
-            send_text: str = "Общие данные:\n"
+            send_text: str = "*Общие данные*\n"
         else:
             for discipline in account.disciplines:
                 if update.message.text.lower() in discipline.name.lower():
                     subjectid: int = discipline.id
-                    send_text: str = f"Данные для {discipline.name}\n"
+                    send_text: str = f"*{discipline.name}*\n"
                     break
             else:
                 await update.message.reply_text(f'❌ Недоступный предмет "{update.message.text}"')
                 return
 
-        attendance_data: 'BARS.AttendaceData' = await client.get_attendace_data(
+        attendance_data: BARS.AttendaceData = await client.get_attendace_data(
             user['pupilid'],
             f"{get_school_start_year()}-09-01",
             f"{get_school_start_year() + 1}-08-31",
@@ -77,9 +77,9 @@ async def process_attendancedata(update: Update, user: dict) -> None:
         attendance_data.absent_bad,
         attendance_data.ill
     )
-    send_text += f'\n\nВы были на {int(round(attendance_data.present / attendance_data.total, 2) * 100)}% уроков'
+    send_text += f'\n\nВы были на {int(round(attendance_data.present / attendance_data.total, 2) * 100)}% уроков!'
 
-    await update.message.reply_text(send_text)
+    await update.message.reply_text(send_text, parse_mode='Markdown')
 
 
 async def process_progressdata(update: Update, user: dict) -> None:
@@ -91,21 +91,21 @@ async def process_progressdata(update: Update, user: dict) -> None:
         raise TelegramBotError()
 
     async with BClientAsync(user['sessionid']) as client:
-        account: 'BARS.AccountInfo' = await client.get_account_info()
+        account: BARS.AccountInfo = await client.get_account_info()
         if update.message.text.lower() == 'все':
             subjectid: int = 0
-            send_text: str = "Общие данные:\n"
+            send_text: str = "*Общие данные*\n"
         else:
             for discipline in account.disciplines:
                 if update.message.text.lower() in discipline.name.lower():
                     subjectid: int = discipline.id
-                    send_text: str = f"Данные для {discipline.name}\n"
+                    send_text: str = f"*{discipline.name}*\n"
                     break
             else:
                 await update.message.reply_text(f'❌ Недоступный предмет "{update.message.text}"')
                 return
 
-        progress_data: 'BARS.ProgressData' = await client.get_progress_data(
+        progress_data: BARS.ProgressData = await client.get_progress_data(
             user['pupilid'],
             f"{get_school_start_year()}-09-01",
             f"{get_school_start_year() + 1}-08-31",

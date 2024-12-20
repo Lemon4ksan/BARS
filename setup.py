@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 setup(
     name='BARS',
     version='1.1',
-    description='BARS Rest-API',  # Добавьте описание
+    description='BARS Rest-API',
     packages=find_packages(),
     install_requires=[
         'httpx',

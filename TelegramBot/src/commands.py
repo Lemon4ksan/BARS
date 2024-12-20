@@ -76,7 +76,7 @@ async def get_diary(
     result_dict: dict = {'current_weekday': date.weekday()}
 
     async with BClientAsync(user['sessionid']) as client:
-        diary_days: Sequence['BARS.DiaryDay'] = await client.get_diary(date)
+        diary_days: Sequence[BARS.DiaryDay] = await client.get_diary(date)
 
     send_text: str = proccess_diary(result_dict, diary_days, date)
     user['diary_week'] = result_dict
@@ -146,7 +146,7 @@ async def get_schedule_day(
     result_dict: dict = {'current_weekday': date.weekday()}
 
     async with BClientAsync(user['sessionid']) as client:
-        schedule_week: Sequence['BARS.ScheduleDay'] = await client.get_week_schedule(date)
+        schedule_week: Sequence[BARS.ScheduleDay] = await client.get_week_schedule(date)
 
     send_text: str = proccess_schedule(result_dict, schedule_week, date)
     user['schedule_week'] = result_dict
@@ -166,12 +166,12 @@ async def get_summary_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
     user: dict = get_user_from_db(update)
     async with BClientAsync(user['sessionid']) as client:
-        summary_marks: 'BARS.SummaryMarks' = await client.get_summary_marks(datetime.now().date())
+        summary_marks: BARS.SummaryMarks = await client.get_summary_marks(datetime.now().date())
 
     send_text: str = ''
     for discipline in summary_marks.disciplines:
-        marks = [str(marks.mark) for marks in discipline.marks]
-        send_text += f"\n*{discipline.discipline}*: {discipline.average_mark}\n{' '.join(marks)}"
+        marks: list = [mark for mark in discipline.marks]
+        send_text += f"\n*{discipline.discipline}*: {discipline.average_mark}\n{' '.join([str(mark.mark) for mark in sorted(marks, key=lambda x: x.date)])}"
 
     await update.message.reply_text(send_text, parse_mode='Markdown')
 
@@ -184,7 +184,7 @@ async def get_total_marks(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     total_marks_dict: dict = {}
 
     async with BClientAsync(user['sessionid']) as client:
-        total_marks: 'BARS.TotalMarks' = await client.get_total_marks()
+        total_marks: BARS.TotalMarks = await client.get_total_marks()
 
     subperiod: BARS.Subperiod  # Четверть
     discipline_mark: BARS.TotalMarksDiscipline  # Сборник оценок по предмету

@@ -3,7 +3,8 @@ import httpx
 import logging
 import functools
 from collections.abc import Sequence, Callable
-from typing import Optional, LiteralString, Any
+from typing import Optional, Literal, Any, Self, Type
+from types import TracebackType
 
 from .exceptions import Unauthorized, BClientException, InternalError
 from ._base import ClientObject
@@ -79,11 +80,16 @@ class BClient(ClientObject):
         self._httpx_client: Optional[httpx.Client] = None
         self.proxy = proxy
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         self._httpx_client = httpx.Client(proxy=self.proxy)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        t: Optional[Type[BaseException]],
+        value: Optional[BaseException],
+        traceback: Optional[TracebackType]
+    ) -> None:
         if self._httpx_client:
             self._httpx_client.close()
 
@@ -109,7 +115,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if isinstance(result, dict) and 'faultcode' in result.keys():
+        if isinstance(result, dict) and 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -140,7 +146,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if isinstance(result, dict) and 'faultcode' in result.keys():
+        if isinstance(result, dict) and 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -174,7 +180,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if isinstance(result, dict) and 'faultcode' in result.keys():
+        if isinstance(result, dict) and 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -187,7 +193,7 @@ class BClient(ClientObject):
         return return_data
 
     @log
-    def get_schedule_report_link(self, date: str, interval: LiteralString = 'week') -> str:
+    def get_schedule_report_link(self, date: str, interval: Literal['week', 'month'] = 'week') -> str:
         """Поулчить абсолютную ссылку на загрузку таблицы расписания.
 
         Args:
@@ -211,7 +217,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if isinstance(result, dict) and 'faultcode' in result.keys():
+        if isinstance(result, dict) and 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -244,7 +250,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if 'faultcode' in result.keys():
+        if 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -271,7 +277,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if 'faultcode' in result.keys():
+        if 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -298,7 +304,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if 'faultcode' in result.keys():
+        if 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -325,7 +331,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if 'faultcode' in result.keys():
+        if 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -366,7 +372,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if 'faultcode' in result.keys():
+        if 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -407,7 +413,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if 'faultcode' in result.keys():
+        if 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -434,7 +440,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if 'faultcode' in result.keys():
+        if 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -461,7 +467,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if 'faultcode' in result.keys():
+        if 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -492,7 +498,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if isinstance(result, dict) and 'faultcode' in result.keys():
+        if isinstance(result, dict) and 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -523,7 +529,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if isinstance(result, dict) and 'faultcode' in result.keys():
+        if isinstance(result, dict) and 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')
@@ -537,7 +543,7 @@ class BClient(ClientObject):
             return []
 
     @log
-    def get_events(self) -> Optional[Sequence[Event]]:
+    def get_events(self) -> Sequence[Event]:
         """Получить список текущих праздников.
 
         Returns:
@@ -554,7 +560,7 @@ class BClient(ClientObject):
         except json.JSONDecodeError:
             raise InternalError('В данный момент сайт недоступен.')
 
-        if isinstance(result, dict) and 'faultcode' in result.keys():
+        if isinstance(result, dict) and 'faultcode' in result:
             match result['faultcode']:
                 case 'Server.UserNotAuthenticated':
                     raise Unauthorized('Недействительный sessionid')

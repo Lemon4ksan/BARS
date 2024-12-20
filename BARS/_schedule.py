@@ -9,7 +9,7 @@ class ScheduleLesson(ClientObject):
     """Класс, представляющий урок из дневника.
 
     Attributes:
-        ID (`int`, optional): Уникальный идентификатор задания. Может быть пустым.
+        id (`int`, optional): Уникальный идентификатор задания. Может быть пустым.
         date (`str`): Дата формата День-Месяц-Год.
         discipline (`str`): Название урока.
         has_auth_sferum (`bool`, optional): Есть ли регистрация в Сферум. Может быть пустым.
@@ -23,11 +23,11 @@ class ScheduleLesson(ClientObject):
         time_end (`str`, optional): Часы-Минуты конца урока. Может быть пустым.
     """
 
+    id: int
     date: str
     discipline: str
     index: int
     is_control_work: bool
-    ID: Optional[int] = None
     has_auth_sferum: Optional[bool] = None
     office: Optional[str] = None
     study_time_name: Optional[str] = None
@@ -43,6 +43,7 @@ class ScheduleLesson(ClientObject):
     ) -> 'ScheduleLesson':
 
         data = super(ScheduleLesson, cls).de_json(data)
+        data['id'] = data['id']  # Почему-то это исключает ошибку.
 
         return cls(**data)
 
