@@ -54,6 +54,6 @@ if __name__ == '__main__':
     application.add_handler(message_handler)
     application.add_handler(callback_handler)
 
-    application.add_error_handler(handle_exception)
+    application.add_error_handler(handle_exception)  # type: ignore Странные тайп-хинты.
 
     application.run_polling()

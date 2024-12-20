@@ -1,11 +1,11 @@
 import logging
 import traceback
+from typing import Optional
 
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from BARS import exceptions as BARS_exceptions
-from BARS.exceptions import InternalError
+from BARS.exceptions import InternalError, Unauthorized
 
 from . import templates
 from . import exceptions as bot_exceptions
@@ -16,9 +16,16 @@ from .utils.handlers_utils import (
 )
 
 
-async def handle_exception(update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def handle_exception(update: Optional[Update], context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обработчик исключений."""
 
+    if update is None:  # Это происходит при сбоях в сети.
+        logging.warning("Был получен пустой update при обработке исключения.")
+        return
+    if update.effective_message is None:
+        logging.warning("Было получено пустое сообщение при обработке исключения.")
+        return
+    
     if isinstance(context.error, KeyError):  # wildcard
         user: dict = get_user_from_db(update)
         for key in templates.USER_DICT.keys():
@@ -26,9 +33,9 @@ async def handle_exception(update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 user[key] = None
         logging.error("".join(traceback.format_exception(None, context.error, context.error.__traceback__)))
         update_db(user, update)
-        await update.effective_message.reply_text('❌ Внутренняя ошибка. Попробуйте ещё раз')
-    elif isinstance(context.error, BARS_exceptions.Unauthorized):
-        await update.effective_message.reply_text('❌ Недействительный sessionid. Обновите его с помощью /set_sessionid')
+        await update.effective_message.reply_text('❌ Внутренняя ошибка. Попробуйте ещё раз.')
+    elif isinstance(context.error, Unauthorized):
+        await update.effective_message.reply_text('❌ Недействительный sessionid. Обновите его с помощью /set_sessionid.')
     elif isinstance(context.error, InternalError):
         await update.effective_message.reply_text(f'❌ В данный момент сайт недоступен. Повторите попытку позже.')
     elif isinstance(context.error, bot_exceptions.TelegramBotError):
