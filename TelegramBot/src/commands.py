@@ -1,6 +1,7 @@
 import json
 from collections.abc import Sequence
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
@@ -15,6 +16,7 @@ from . import templates
 
 # TODO: Добавить опцию для учёта субботы
 
+DB_PATH: Path = Path.cwd() / 'TelegramBot' / 'db.json'
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Инициализация пользователя в датабазе. Вывод доступных команд."""
@@ -26,10 +28,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     await update.effective_message.reply_text(templates.WELCOME_TEXT, parse_mode='Markdown')
     try:
-        with open('.\\TelegramBot\\db.json', 'r') as f:
+        with open(DB_PATH, 'r') as f:
             contents: dict = dict(json.load(f))
     except FileNotFoundError:
-        with open('.\\TelegramBot\\db.json', 'w') as f:
+        with open(DB_PATH, 'w') as f:
             json.dump({}, f)
         contents = {}
 

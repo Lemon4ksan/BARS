@@ -2,6 +2,9 @@ import os
 import logging
 import coloredlogs
 
+if os.path.basename(os.getcwd()) == 'TelegramBot':  # если venv не настроен
+    os.chdir('..')
+
 from dotenv import load_dotenv
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler
 from telegram.ext.filters import ALL
